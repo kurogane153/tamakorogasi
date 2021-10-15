@@ -1,5 +1,5 @@
 sceneSetups:
-- path: Assets/Nagahama/Nagahama_WorkScene.unity
+- path: Assets/Nagahama/Nagahama_Scenes/Nagahama_WorkScene.unity
   isLoaded: 1
   isActive: 1
   isSubScene: 0
