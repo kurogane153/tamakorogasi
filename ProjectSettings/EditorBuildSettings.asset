@@ -4,5 +4,11 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/TitleScene.unity
+    guid: a4896d47c96bd6342a4fba72e1f768bb
+  - enabled: 1
+    path: Assets/Nagahama/Nagahama_Scenes/Nagahama_WorkScene.unity
+    guid: 499f5928ccaabde4eb07cb2c76a61d16
   m_configObjects: {}

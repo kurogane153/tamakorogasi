@@ -66,6 +66,12 @@
   <ItemGroup>
     <Compile Include="Assets\Nagahama\Nagahama_Scripts\BallControll.cs" />
     <Compile Include="Assets\Nagahama\Nagahama_Scripts\FloorControll.cs" />
+    <Compile Include="Assets\Nagahama\Nagahama_Scripts\ForceSelect.cs" />
+    <Compile Include="Assets\Nagahama\Nagahama_Scripts\Menu.cs" />
+    <Compile Include="Assets\Nagahama\Nagahama_Scripts\PauseManager.cs" />
+    <Compile Include="Assets\Nagahama\Nagahama_Scripts\PauseUIScripts.cs" />
+    <Compile Include="Assets\Nagahama\Nagahama_Scripts\Pauser.cs" />
+    <Compile Include="Assets\Nagahama\Nagahama_Scripts\TitleUIScripts.cs" />
     <Compile Include="Assets\Script\ballRun.cs" />
     <None Include="Assets\SkySerie Freebie\Hdri setup.txt" />
     <Reference Include="UnityEngine">
