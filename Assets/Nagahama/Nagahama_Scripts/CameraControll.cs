@@ -11,6 +11,8 @@ public class CameraControll : MonoBehaviour
 
     [SerializeField] private Vector3 _offset;           // オフセット
 
+    [SerializeField, Tooltip("カメラ移動の滑らかさ")] private float _cameraMoveLerpFactor = 2.0f;    // カメラが移動する速さ
+
     [SerializeField, Tooltip("この距離以上連続して移動すると追尾をする")]
     private float _followContinuousMoveDistance = 0.15f;
 
@@ -41,8 +43,12 @@ public class CameraControll : MonoBehaviour
         targetPos.y = transform.position.y;
 
         // ターゲットの今のフレームでの位置と前フレームでの位置との距離がinspectorで設定した値以上なら、「移動した」とみなす
-        float targetPrePosDistance = Vector3.Distance(_target.position, preTargetPos);
-        if (_followPrePosDifferenceDisctace <= targetPrePosDistance) {
+        Vector3 prePos = preTargetPos;
+        prePos.y = 0;
+        Vector3 newPos = _target.position;
+        newPos.y = 0;
+        float targetPrePosDistance = Vector3.Distance(newPos, prePos);
+        if (_followPrePosDifferenceDisctace < targetPrePosDistance) {
             continuousMoveDistance += targetPrePosDistance;
             lastCountinuousMovePos = _target.position;
             Debug.Log("連続移動");
@@ -53,17 +59,27 @@ public class CameraControll : MonoBehaviour
 
         if (_followContinuousMoveDistance <= continuousMoveDistance) {
             // 自分自身の座標に、targetの座標に相対座標を足した値を設定する
-            transform.position = Vector3.Lerp(transform.position, targetPos, 6.0f * Time.deltaTime);
+            transform.position = Vector3.Lerp(transform.position, targetPos, _cameraMoveLerpFactor * Time.deltaTime);
         }
 
         if(_followContinuousMoveDistance <= Vector3.Distance(_target.position, lastCountinuousMovePos)) {
             // 自分自身の座標に、targetの座標に相対座標を足した値を設定する
-            transform.position = Vector3.Lerp(transform.position, targetPos, 6.0f * Time.deltaTime);
+            //transform.position = Vector3.Lerp(transform.position, targetPos, _cameraMoveLerpFactor * Time.deltaTime);
             //lastCountinuousMovePos = _target.position;
-            Debug.Log("最低移動");
+            //Debug.Log("最低移動");
         }
 
         preTargetPos = _target.position;
 
+    }
+
+    private void OnGUI()
+    {
+        Vector3 prePos = preTargetPos;
+        prePos.y = 0;
+        Vector3 newPos = _target.position;
+        newPos.y = 0;
+        float targetPrePosDistance = Vector3.Distance(newPos, prePos);
+        GUI.Label(new Rect(0, 180, 500, 100), "targetPrePosDistance: " + targetPrePosDistance);
     }
 }
