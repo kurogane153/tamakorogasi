@@ -80,6 +80,6 @@ public class CameraControll : MonoBehaviour
         Vector3 newPos = _target.position;
         newPos.y = 0;
         float targetPrePosDistance = Vector3.Distance(newPos, prePos);
-        GUI.Label(new Rect(0, 180, 500, 100), "targetPrePosDistance: " + targetPrePosDistance);
+        //GUI.Label(new Rect(0, 180, 500, 100), "targetPrePosDistance: " + targetPrePosDistance);
     }
 }
