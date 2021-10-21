@@ -2,19 +2,12 @@
 using System.Collections;
 using System.Collections.Generic;
 
-/// <summary>
-/// 子にあるオブジェクトを円状に配置するクラス
-/// </summary>
 public class CircleDeployer : MonoBehaviour
 {
 
     //半径
     [SerializeField]
     private float _radius;
-
-    //=================================================================================
-    //初期化
-    //=================================================================================
 
     private void Awake()
     {
@@ -27,7 +20,7 @@ public class CircleDeployer : MonoBehaviour
         Deploy();
     }
 
-    //子を円状に配置する(ContextMenuで鍵マークの所にメニュー追加)
+    //子を円状に配置する
     [ContextMenu("Deploy")]
     private void Deploy()
     {
