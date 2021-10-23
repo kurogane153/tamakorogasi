@@ -10,10 +10,23 @@ public class FloorControll : MonoBehaviour
     [SerializeField] private float _decelerateTimeStickNeutral = 1f;    // 傾けている途中にスティックが離されたとき傾く速度を0にするまでにかかる時間
     [SerializeField] private float _reachTimeNeutralAngle = 1.5f; // 元の角度にリセットされるまでの時間
     [SerializeField] private float _maxAngle = 30f;             // 最大傾き角度
-    [SerializeField] AnimationCurve _curve;
+    [SerializeField] AnimationCurve _increaseCurve;         // 加速に使うカーブ
+    [SerializeField] AnimationCurve _decreaseCurve; // 減速に使うカーブ
+    
 
+    private enum InputDirection
+    {
+        None,   // なし
+        Up,     // 上
+        Down,   // 下
+        Left,   // 左
+        Right   // 右
+    }
+
+    private InputDirection inDir = InputDirection.None;
     private float step = 0;
     private float startTime;
+    private float startTime2;
     private Vector3 lastAngle;
     private bool isStickReleased = false;
     private bool isReturnHorizontal = false;
@@ -27,6 +40,7 @@ public class FloorControll : MonoBehaviour
         style = new GUIStyle();
         style.fontSize = 30;
         startTime = Time.timeSinceLevelLoad;
+        startTime2 = Time.timeSinceLevelLoad;
     }
 
     void Update()
@@ -41,9 +55,9 @@ public class FloorControll : MonoBehaviour
         float V = Input.GetAxis("Vertical");
 
         if((_verDeadZone < V && !isStickReleased)||
-            V < -_verDeadZone && !isStickReleased ||
-            H < -_horDeadZone && !isStickReleased ||
-            _horDeadZone < H && !isStickReleased) {
+            (V < -_verDeadZone && !isStickReleased) ||
+            (H < -_horDeadZone && !isStickReleased) ||
+            (_horDeadZone < H && !isStickReleased)) {
 
             if (!preStickDown) {
                 startRotation = transform.rotation;
@@ -62,9 +76,27 @@ public class FloorControll : MonoBehaviour
 
         // 上入力
         if      ( _verDeadZone < V && !isStickReleased) {
+
             var diff = Time.timeSinceLevelLoad - startTime;
             var rate = diff / _reachTimeNeutralAngle;
-            var pos = _curve.Evaluate(rate);
+
+            if (inDir != InputDirection.Up && inDir != InputDirection.None) {
+                rate = diff / _decelerateTimeStickNeutral;
+                transform.rotation = Quaternion.Slerp(startRotation, Quaternion.Euler(lastAngle), rate);
+
+                if (diff >= _reachTimeNeutralAngle) {
+                    startRotation = transform.rotation;
+                    startTime = Time.timeSinceLevelLoad;
+                    preStickDown = false;
+                }
+                return;
+            }
+
+
+            inDir = InputDirection.Up;
+
+            
+            var pos = _increaseCurve.Evaluate(rate);
             transform.rotation = Quaternion.Slerp(startRotation, Quaternion.Euler(_maxAngle, 0, 0), pos);
             lastAngle = new Vector3(_maxAngle, 0, 0);
 
@@ -74,7 +106,22 @@ public class FloorControll : MonoBehaviour
         else if ( V < -_verDeadZone && !isStickReleased) {
             var diff = Time.timeSinceLevelLoad - startTime;
             var rate = diff / _reachTimeNeutralAngle;
-            var pos = _curve.Evaluate(rate);
+
+            if (inDir != InputDirection.Down && inDir != InputDirection.None) {
+                rate = diff / _decelerateTimeStickNeutral;
+                transform.rotation = Quaternion.Slerp(startRotation, Quaternion.Euler(lastAngle), rate);
+
+                if (diff >= _reachTimeNeutralAngle) {
+                    startRotation = transform.rotation;
+                    startTime = Time.timeSinceLevelLoad;
+                    preStickDown = false;
+                }
+                return;
+            }
+
+
+            inDir = InputDirection.Down;
+            var pos = _increaseCurve.Evaluate(rate);
             transform.rotation = Quaternion.Slerp(startRotation, Quaternion.Euler(-_maxAngle, 0, 0), pos);
             lastAngle = new Vector3(-_maxAngle, 0, 0);
 
@@ -82,10 +129,25 @@ public class FloorControll : MonoBehaviour
         }
 
         // 左入力
-        if ( H < -_horDeadZone && !isStickReleased) {
+        else if ( H < -_horDeadZone && !isStickReleased) {
             var diff = Time.timeSinceLevelLoad - startTime;
             var rate = diff / _reachTimeNeutralAngle;
-            var pos = _curve.Evaluate(rate);
+
+            if (inDir != InputDirection.Left && inDir != InputDirection.None) {
+                rate = diff / _decelerateTimeStickNeutral;
+                transform.rotation = Quaternion.Slerp(startRotation, Quaternion.Euler(lastAngle), rate);
+
+                if (diff >= _reachTimeNeutralAngle) {
+                    startRotation = transform.rotation;
+                    startTime = Time.timeSinceLevelLoad;
+                    preStickDown = false;
+                }
+                return;
+            }
+
+
+            inDir = InputDirection.Left;
+            var pos = _increaseCurve.Evaluate(rate);
             transform.rotation = Quaternion.Slerp(startRotation, Quaternion.Euler(0, 0, _maxAngle), pos);
             lastAngle = new Vector3(0, 0, _maxAngle);
 
@@ -95,7 +157,22 @@ public class FloorControll : MonoBehaviour
         else if ( _horDeadZone < H && !isStickReleased) {
             var diff = Time.timeSinceLevelLoad - startTime;
             var rate = diff / _reachTimeNeutralAngle;
-            var pos = _curve.Evaluate(rate);
+
+            if (inDir != InputDirection.Right && inDir != InputDirection.None) {
+                rate = diff / _decelerateTimeStickNeutral;
+                transform.rotation = Quaternion.Slerp(startRotation, Quaternion.Euler(lastAngle), rate);
+
+                if (diff >= _reachTimeNeutralAngle) {
+                    startRotation = transform.rotation;
+                    startTime = Time.timeSinceLevelLoad;
+                    preStickDown = false;
+                }
+                return;
+            }
+
+
+            inDir = InputDirection.Right;
+            var pos = _increaseCurve.Evaluate(rate);
             transform.rotation = Quaternion.Slerp(startRotation, Quaternion.Euler(0, 0, -_maxAngle), pos);
             lastAngle = new Vector3(0, 0, -_maxAngle);
 
@@ -108,26 +185,33 @@ public class FloorControll : MonoBehaviour
             && H > -_horDeadZone 
             && _horDeadZone > H ) {
 
+            inDir = InputDirection.None;
+
             if (preStickDown) {
-                startRotation = transform.rotation;
+                //startRotation = transform.rotation;
+                startTime2 = Time.timeSinceLevelLoad;
                 preStickDown = false;
-                startTime = Time.timeSinceLevelLoad;
+                //startTime = Time.timeSinceLevelLoad;
             }
 
             // 傾ける力がまだ残っていたら、それを0に戻す
-            if (0 < step) {
-                var diff = Time.timeSinceLevelLoad - startTime;
-                var rate = diff / _reachTimeNeutralAngle;
-                var pos = _curve.Evaluate(rate);
+            if (!isReturnHorizontal && 0 < step) {
+                var diff2 = Time.timeSinceLevelLoad - startTime2;
+                var rate2 = diff2 / _decelerateTimeStickNeutral;
 
-                step = Mathf.SmoothStep(0, step, Time.deltaTime * _decelerateTimeStickNeutral);
+                var diff = Time.timeSinceLevelLoad - startTime;
+                var rate = diff / (_reachTimeNeutralAngle + (_reachTimeNeutralAngle / 2) * rate2);
+                
+                var pos = _increaseCurve.Evaluate(rate);
+
                 transform.rotation = Quaternion.Slerp(startRotation, Quaternion.Euler(lastAngle), pos);
                 isStickReleased = true;
 
-                if(step <= 0) {
+                if(diff2 >= _decelerateTimeStickNeutral) {
                     isReturnHorizontal = true;
                     startTime = Time.timeSinceLevelLoad;
                     startRotation = transform.rotation;
+                    step = 0;
                 }
             }
 
@@ -142,7 +226,7 @@ public class FloorControll : MonoBehaviour
                 }
 
                 var rate = diff / _reachTimeNeutralAngle;
-                var pos = _curve.Evaluate(rate);
+                var pos = _increaseCurve.Evaluate(rate);
                 
                 transform.rotation = Quaternion.Slerp(startRotation, Quaternion.Euler(0, 0, 0), pos);
                 isStickReleased = false;
@@ -155,8 +239,17 @@ public class FloorControll : MonoBehaviour
 
     private void OnGUI()
     {
-        GUI.Label(new Rect(0, 180, 500, 100), "step: " + step, style);
-        GUI.Label(new Rect(0, 280, 500, 100), "isStickReleased: " + isStickReleased, style);
+        if (!isReturnHorizontal && 0 < step) {
+            var diff2 = Time.timeSinceLevelLoad - startTime2;
+            var rate2 = diff2 / _decelerateTimeStickNeutral;
+
+            var diff = Time.timeSinceLevelLoad - startTime;
+            var rate = diff / (_reachTimeNeutralAngle + (_reachTimeNeutralAngle / 2) * rate2);
+            GUI.Label(new Rect(0, 180, 500, 100), "diff: " + diff, style);
+            GUI.Label(new Rect(0, 230, 500, 100), "rate: " + rate, style);
+            GUI.Label(new Rect(0, 280, 500, 100), "diff2: " + diff2, style);
+            GUI.Label(new Rect(0, 330, 500, 100), "rate2: " + rate2, style);
+        }
 
 
 
