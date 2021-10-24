@@ -24,9 +24,11 @@ public class FloorControll : MonoBehaviour
     }
 
     private InputDirection inDir = InputDirection.None;
+    private InputDirection preInDir = InputDirection.None;
+
     private float step = 0;
     private float startTime;
-    private float startTime2;
+    private float stickNeutralStartTime;
     private Vector3 lastAngle;
     private bool isStickReleased = false;
     private bool isReturnHorizontal = false;
@@ -40,7 +42,7 @@ public class FloorControll : MonoBehaviour
         style = new GUIStyle();
         style.fontSize = 30;
         startTime = Time.timeSinceLevelLoad;
-        startTime2 = Time.timeSinceLevelLoad;
+        stickNeutralStartTime = Time.timeSinceLevelLoad;
     }
 
     void Update()
@@ -54,7 +56,7 @@ public class FloorControll : MonoBehaviour
         float H = Input.GetAxis("Horizontal");
         float V = Input.GetAxis("Vertical");
 
-        if((_verDeadZone < V && !isStickReleased)||
+        if((_verDeadZone < V && !isStickReleased) ||
             (V < -_verDeadZone && !isStickReleased) ||
             (H < -_horDeadZone && !isStickReleased) ||
             (_horDeadZone < H && !isStickReleased)) {
@@ -65,63 +67,104 @@ public class FloorControll : MonoBehaviour
                 startTime = Time.timeSinceLevelLoad;
             }
 
-            
-
-            step = Mathf.SmoothStep(step, 1, Time.deltaTime * _reachTimeMaxAngle);
-
             isStickReleased = false;
             isReturnHorizontal = false;
+
+            if (0 < step) {
+                var diff2 = Time.timeSinceLevelLoad - stickNeutralStartTime;
+                var rate2 = diff2 / _decelerateTimeStickNeutral;
+
+                var diff = Time.timeSinceLevelLoad - startTime;
+                var rate = diff / (_reachTimeNeutralAngle + (_reachTimeNeutralAngle / 1.5f) * rate2);
+
+                var pos = _increaseCurve.Evaluate(rate);
+                transform.rotation = Quaternion.Slerp(startRotation, Quaternion.Euler(lastAngle), pos);
+
+                if (diff2 >= _decelerateTimeStickNeutral) {
+                    startRotation = transform.rotation;
+                    startTime = Time.timeSinceLevelLoad;
+                    preStickDown = false;
+                    step = 0;
+                }
+                preInDir = inDir;
+                return;
+            }
 
         }
 
         // 上入力
         if      ( _verDeadZone < V && !isStickReleased) {
 
+            inDir = InputDirection.Up;
+
             var diff = Time.timeSinceLevelLoad - startTime;
             var rate = diff / _reachTimeNeutralAngle;
+            var pos = _increaseCurve.Evaluate(rate);
 
-            if (inDir != InputDirection.Up && inDir != InputDirection.None) {
-                rate = diff / _decelerateTimeStickNeutral;
-                transform.rotation = Quaternion.Slerp(startRotation, Quaternion.Euler(lastAngle), rate);
-
-                if (diff >= _reachTimeNeutralAngle) {
-                    startRotation = transform.rotation;
-                    startTime = Time.timeSinceLevelLoad;
-                    preStickDown = false;
-                }
+            if(preInDir != InputDirection.Up && preInDir != InputDirection.None) {
+                stickNeutralStartTime = Time.timeSinceLevelLoad;
+                step = Mathf.SmoothStep(step, 1, Time.deltaTime * _reachTimeMaxAngle);
                 return;
             }
 
+            if ( 0 < step) {
+                var diff2 = Time.timeSinceLevelLoad - stickNeutralStartTime;
+                var rate2 = diff2 / _decelerateTimeStickNeutral;
 
-            inDir = InputDirection.Up;
+                rate = diff / (_reachTimeNeutralAngle + (_reachTimeNeutralAngle / 1.5f) * rate2);
+                pos = _increaseCurve.Evaluate(rate);
+                transform.rotation = Quaternion.Slerp(startRotation, Quaternion.Euler(lastAngle), pos);
+
+                if (diff2 >= _decelerateTimeStickNeutral) {
+                    startRotation = transform.rotation;
+                    startTime = Time.timeSinceLevelLoad;
+                    preStickDown = false;
+                    step = 0;
+                }
+                preInDir = inDir;
+                return;
+            }
 
             
-            var pos = _increaseCurve.Evaluate(rate);
+            
             transform.rotation = Quaternion.Slerp(startRotation, Quaternion.Euler(_maxAngle, 0, 0), pos);
             lastAngle = new Vector3(_maxAngle, 0, 0);
 
-
+            
         }
         // 下入力
         else if ( V < -_verDeadZone && !isStickReleased) {
+            inDir = InputDirection.Down;
+
             var diff = Time.timeSinceLevelLoad - startTime;
             var rate = diff / _reachTimeNeutralAngle;
+            var pos = _increaseCurve.Evaluate(rate);
 
-            if (inDir != InputDirection.Down && inDir != InputDirection.None) {
-                rate = diff / _decelerateTimeStickNeutral;
-                transform.rotation = Quaternion.Slerp(startRotation, Quaternion.Euler(lastAngle), rate);
-
-                if (diff >= _reachTimeNeutralAngle) {
-                    startRotation = transform.rotation;
-                    startTime = Time.timeSinceLevelLoad;
-                    preStickDown = false;
-                }
+            if (preInDir != InputDirection.Down && preInDir != InputDirection.None) {
+                stickNeutralStartTime = Time.timeSinceLevelLoad;
+                step = Mathf.SmoothStep(step, 1, Time.deltaTime * _reachTimeMaxAngle);
                 return;
             }
 
+            if (0 < step) {
+                var diff2 = Time.timeSinceLevelLoad - stickNeutralStartTime;
+                var rate2 = diff2 / _decelerateTimeStickNeutral;
 
-            inDir = InputDirection.Down;
-            var pos = _increaseCurve.Evaluate(rate);
+                rate = diff / (_reachTimeNeutralAngle + (_reachTimeNeutralAngle / 1.5f) * rate2);
+                pos = _increaseCurve.Evaluate(rate);
+                transform.rotation = Quaternion.Slerp(startRotation, Quaternion.Euler(lastAngle), pos);
+
+                if (diff2 >= _decelerateTimeStickNeutral) {
+                    startRotation = transform.rotation;
+                    startTime = Time.timeSinceLevelLoad;
+                    preStickDown = false;
+                    step = 0;
+                }
+                preInDir = inDir;
+                return;
+            }
+
+           
             transform.rotation = Quaternion.Slerp(startRotation, Quaternion.Euler(-_maxAngle, 0, 0), pos);
             lastAngle = new Vector3(-_maxAngle, 0, 0);
 
@@ -130,24 +173,39 @@ public class FloorControll : MonoBehaviour
 
         // 左入力
         else if ( H < -_horDeadZone && !isStickReleased) {
+
+            inDir = InputDirection.Left;
+
             var diff = Time.timeSinceLevelLoad - startTime;
             var rate = diff / _reachTimeNeutralAngle;
+            var pos = _increaseCurve.Evaluate(rate);
 
-            if (inDir != InputDirection.Left && inDir != InputDirection.None) {
-                rate = diff / _decelerateTimeStickNeutral;
-                transform.rotation = Quaternion.Slerp(startRotation, Quaternion.Euler(lastAngle), rate);
+            if (preInDir != InputDirection.Left && preInDir != InputDirection.None) {
+                stickNeutralStartTime = Time.timeSinceLevelLoad;
+                step = Mathf.SmoothStep(step, 1, Time.deltaTime * _reachTimeMaxAngle);
+                return;
+            }
 
-                if (diff >= _reachTimeNeutralAngle) {
+            if (0 < step) {
+                var diff2 = Time.timeSinceLevelLoad - stickNeutralStartTime;
+                var rate2 = diff2 / _decelerateTimeStickNeutral;
+
+                rate = diff / (_reachTimeNeutralAngle + (_reachTimeNeutralAngle / 1.5f) * rate2);
+                pos = _increaseCurve.Evaluate(rate);
+                transform.rotation = Quaternion.Slerp(startRotation, Quaternion.Euler(lastAngle), pos);
+
+                if (diff2 >= _decelerateTimeStickNeutral) {
                     startRotation = transform.rotation;
                     startTime = Time.timeSinceLevelLoad;
                     preStickDown = false;
+                    step = 0;
                 }
+                preInDir = inDir;
                 return;
             }
 
 
-            inDir = InputDirection.Left;
-            var pos = _increaseCurve.Evaluate(rate);
+            
             transform.rotation = Quaternion.Slerp(startRotation, Quaternion.Euler(0, 0, _maxAngle), pos);
             lastAngle = new Vector3(0, 0, _maxAngle);
 
@@ -155,24 +213,38 @@ public class FloorControll : MonoBehaviour
         }
         // 右入力
         else if ( _horDeadZone < H && !isStickReleased) {
+            inDir = InputDirection.Right;
+
             var diff = Time.timeSinceLevelLoad - startTime;
             var rate = diff / _reachTimeNeutralAngle;
+            var pos = _increaseCurve.Evaluate(rate);
 
-            if (inDir != InputDirection.Right && inDir != InputDirection.None) {
-                rate = diff / _decelerateTimeStickNeutral;
-                transform.rotation = Quaternion.Slerp(startRotation, Quaternion.Euler(lastAngle), rate);
+            if (preInDir != InputDirection.Right && preInDir != InputDirection.None) {
+                stickNeutralStartTime = Time.timeSinceLevelLoad;
+                step = Mathf.SmoothStep(step, 1, Time.deltaTime * _reachTimeMaxAngle);
+                return;
+            }
 
-                if (diff >= _reachTimeNeutralAngle) {
+            if (0 < step) {
+                var diff2 = Time.timeSinceLevelLoad - stickNeutralStartTime;
+                var rate2 = diff2 / _decelerateTimeStickNeutral;
+
+                rate = diff / (_reachTimeNeutralAngle + (_reachTimeNeutralAngle / 1.5f) * rate2);
+                pos = _increaseCurve.Evaluate(rate);
+                transform.rotation = Quaternion.Slerp(startRotation, Quaternion.Euler(lastAngle), pos);
+
+                if (diff2 >= _decelerateTimeStickNeutral) {
                     startRotation = transform.rotation;
                     startTime = Time.timeSinceLevelLoad;
                     preStickDown = false;
+                    step = 0;
                 }
+                preInDir = inDir;
                 return;
             }
 
 
-            inDir = InputDirection.Right;
-            var pos = _increaseCurve.Evaluate(rate);
+            
             transform.rotation = Quaternion.Slerp(startRotation, Quaternion.Euler(0, 0, -_maxAngle), pos);
             lastAngle = new Vector3(0, 0, -_maxAngle);
 
@@ -183,24 +255,24 @@ public class FloorControll : MonoBehaviour
         if( _verDeadZone > V 
             && V > -_verDeadZone 
             && H > -_horDeadZone 
-            && _horDeadZone > H ) {
+            && _horDeadZone > H || 0 < step) {
 
             inDir = InputDirection.None;
+            
 
             if (preStickDown) {
-                //startRotation = transform.rotation;
-                startTime2 = Time.timeSinceLevelLoad;
+                stickNeutralStartTime = Time.timeSinceLevelLoad;
                 preStickDown = false;
-                //startTime = Time.timeSinceLevelLoad;
+                step = 1;
             }
 
             // 傾ける力がまだ残っていたら、それを0に戻す
             if (!isReturnHorizontal && 0 < step) {
-                var diff2 = Time.timeSinceLevelLoad - startTime2;
+                var diff2 = Time.timeSinceLevelLoad - stickNeutralStartTime;
                 var rate2 = diff2 / _decelerateTimeStickNeutral;
 
                 var diff = Time.timeSinceLevelLoad - startTime;
-                var rate = diff / (_reachTimeNeutralAngle + (_reachTimeNeutralAngle / 2) * rate2);
+                var rate = diff / (_reachTimeNeutralAngle + (_reachTimeNeutralAngle / 1.5f) * rate2);
                 
                 var pos = _increaseCurve.Evaluate(rate);
 
@@ -235,12 +307,14 @@ public class FloorControll : MonoBehaviour
             }
             
         }
+
+        preInDir = inDir;
     }
 
     private void OnGUI()
     {
         if (!isReturnHorizontal && 0 < step) {
-            var diff2 = Time.timeSinceLevelLoad - startTime2;
+            var diff2 = Time.timeSinceLevelLoad - stickNeutralStartTime;
             var rate2 = diff2 / _decelerateTimeStickNeutral;
 
             var diff = Time.timeSinceLevelLoad - startTime;
