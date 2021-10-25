@@ -10,9 +10,7 @@ public class FloorControll : MonoBehaviour
     [SerializeField] private float _decelerateTimeStickNeutral = 1f;    // 傾けている途中にスティックが離されたとき傾く速度を0にするまでにかかる時間
     [SerializeField] private float _reachTimeNeutralAngle = 1.5f; // 元の角度にリセットされるまでの時間
     [SerializeField] private float _maxAngle = 30f;             // 最大傾き角度
-    [SerializeField] AnimationCurve _increaseCurve;         // 加速に使うカーブ
-    [SerializeField] AnimationCurve _decreaseCurve; // 減速に使うカーブ
-    
+    [SerializeField] AnimationCurve _increaseCurve;         // 加速に使うカーブ    
 
     private enum InputDirection
     {
@@ -23,31 +21,29 @@ public class FloorControll : MonoBehaviour
         Right   // 右
     }
 
-    private InputDirection inDir = InputDirection.None;
-    private InputDirection preInDir = InputDirection.None;
+    private InputDirection inDir = InputDirection.None;     // 今のフレームのスティック入力方向
+    private InputDirection preInDir = InputDirection.None;  // 前のフレームのスティック入力方向
 
-    private float step = 0;
-    private float startTime;
-    private float stickNeutralStartTime;
-    private Vector3 lastAngle;
-    private bool isStickReleased = false;
-    private bool isReturnHorizontal = false;
+    private float preH;                     // 前フレームのスティック水平方向入力状態
+    private float preV;                     // 前フレームのスティック垂直方向入力状態
+    private float step = 0;                 // 床の傾く力を失わせる処理の分岐で参照する
+    private float startTime;                // 床をn秒かけて倒すなどの処理の計測開始時間を入れる
+    private float stickNeutralStartTime;    // 床の傾く力をn秒かけて倒す処理の計測開始時間を入れる
+    private Vector3 lastAngle;              // 最後に傾く力をかけていた方向
+    private bool isStickInput = true;      // スティックを入力しているか
+    private bool isReturnHorizontal = false;    // 水平に戻ろうとしているか
     private bool preStickDown = false;  // 前のフレームでスティックを倒していたか
-    private Quaternion startRotation;
+    private Quaternion startRotation;       // 床をn秒かけて倒すとき、倒し始めたフレームの床の角度
 
-    private GUIStyle style;
+    private GUIStyle style;                 // デバッグ表示用
+
+    private float dbgpos;                   // デバッグ表示用
 
     void Start()
     {
+        // デバッグ用
         style = new GUIStyle();
         style.fontSize = 30;
-        startTime = Time.timeSinceLevelLoad;
-        stickNeutralStartTime = Time.timeSinceLevelLoad;
-    }
-
-    void Update()
-    {
-        
     }
 
     private void FixedUpdate()
@@ -55,199 +51,217 @@ public class FloorControll : MonoBehaviour
         // スティック入力を変数に入れてタイピングの手間を省く
         float H = Input.GetAxis("Horizontal");
         float V = Input.GetAxis("Vertical");
+        
+        // スティックの軸が倒されていたら
+        if((_verDeadZone < V && isStickInput) ||
+            (V < -_verDeadZone && isStickInput) ||
+            (H < -_horDeadZone && isStickInput) ||
+            (_horDeadZone < H && isStickInput)) {
 
-        if((_verDeadZone < V && !isStickReleased) ||
-            (V < -_verDeadZone && !isStickReleased) ||
-            (H < -_horDeadZone && !isStickReleased) ||
-            (_horDeadZone < H && !isStickReleased)) {
-
+            // 前フレームでスティックを倒していなかったとき
             if (!preStickDown) {
-                startRotation = transform.rotation;
+                if(step <= 0) {
+                    startRotation = transform.rotation;
+                    startTime = Time.timeSinceLevelLoad;
+                }
+                
                 preStickDown = true;
-                startTime = Time.timeSinceLevelLoad;
+                
             }
 
-            isStickReleased = false;
+            isStickInput = true;        
             isReturnHorizontal = false;
 
+            // stepが0より上のときは床の傾く力を1秒かけて減速させる処理をする・
             if (0 < step) {
+                // 1秒かけて減速、の計算に使う
                 var diff2 = Time.timeSinceLevelLoad - stickNeutralStartTime;
                 var rate2 = diff2 / _decelerateTimeStickNeutral;
 
+                // もともと床にかかっていた力
                 var diff = Time.timeSinceLevelLoad - startTime;
-                var rate = diff / (_reachTimeNeutralAngle + (_reachTimeNeutralAngle / 1.5f) * rate2);
+                var rate = diff / (_reachTimeNeutralAngle + (_reachTimeNeutralAngle / 2) * rate2);
 
+                // アニメーションカーブを使って、徐々に加速し、トップスピードなる、という表現をさせる
                 var pos = _increaseCurve.Evaluate(rate);
+                dbgpos = pos;
+
+                // 補完を使って傾きの計算をする
                 transform.rotation = Quaternion.Slerp(startRotation, Quaternion.Euler(lastAngle), pos);
 
+                // 床をn秒かけて減速という処理、その秒数に達したら、もとの力をかける処理に戻る
                 if (diff2 >= _decelerateTimeStickNeutral) {
                     startRotation = transform.rotation;
                     startTime = Time.timeSinceLevelLoad;
                     preStickDown = false;
                     step = 0;
                 }
+
                 preInDir = inDir;
-                return;
+                preH = H;
+                preV = V;
+                return; // 早期リターン
             }
 
         }
 
         // 上入力
-        if      ( _verDeadZone < V && !isStickReleased) {
+        if      ( _verDeadZone < V && isStickInput) {
 
             inDir = InputDirection.Up;
 
             var diff = Time.timeSinceLevelLoad - startTime;
             var rate = diff / _reachTimeNeutralAngle;
             var pos = _increaseCurve.Evaluate(rate);
+            dbgpos = pos;
 
-            if(preInDir != InputDirection.Up && preInDir != InputDirection.None) {
+            if (preInDir != InputDirection.Up && preInDir != InputDirection.None) {
                 stickNeutralStartTime = Time.timeSinceLevelLoad;
-                step = Mathf.SmoothStep(step, 1, Time.deltaTime * _reachTimeMaxAngle);
+                step = 1;
+                preH = H;
+                preV = V;
                 return;
             }
+            
+            lastAngle.x = _maxAngle;
 
-            if ( 0 < step) {
-                var diff2 = Time.timeSinceLevelLoad - stickNeutralStartTime;
-                var rate2 = diff2 / _decelerateTimeStickNeutral;
+            if( H < -_horDeadZone && isStickInput && !(preH < -_horDeadZone)) {
+                // 追加左入力があったら、左奥に傾けられるようにする
+                //lastAngle.z = _maxAngle;
+                stickNeutralStartTime = Time.timeSinceLevelLoad;
+                step = 1;
+                preH = H;
+                preV = V;
 
-                rate = diff / (_reachTimeNeutralAngle + (_reachTimeNeutralAngle / 1.5f) * rate2);
-                pos = _increaseCurve.Evaluate(rate);
-                transform.rotation = Quaternion.Slerp(startRotation, Quaternion.Euler(lastAngle), pos);
-
-                if (diff2 >= _decelerateTimeStickNeutral) {
-                    startRotation = transform.rotation;
-                    startTime = Time.timeSinceLevelLoad;
-                    preStickDown = false;
-                    step = 0;
-                }
-                preInDir = inDir;
-                return;
+            } else if ( _horDeadZone < H && isStickInput && !(_horDeadZone < -preH)) {
+                // 追加右入力があったら、右奥に傾けられるようにする
+                //lastAngle.z = -_maxAngle;
+                stickNeutralStartTime = Time.timeSinceLevelLoad;
+                step = 1;
+                preH = H;
+                preV = V;
             }
 
-            
-            
-            transform.rotation = Quaternion.Slerp(startRotation, Quaternion.Euler(_maxAngle, 0, 0), pos);
-            lastAngle = new Vector3(_maxAngle, 0, 0);
+            transform.rotation = Quaternion.Slerp(startRotation, Quaternion.Euler(lastAngle), pos);
 
-            
         }
         // 下入力
-        else if ( V < -_verDeadZone && !isStickReleased) {
+        else if ( V < -_verDeadZone && isStickInput) {
             inDir = InputDirection.Down;
 
             var diff = Time.timeSinceLevelLoad - startTime;
             var rate = diff / _reachTimeNeutralAngle;
             var pos = _increaseCurve.Evaluate(rate);
+            dbgpos = pos;
 
             if (preInDir != InputDirection.Down && preInDir != InputDirection.None) {
                 stickNeutralStartTime = Time.timeSinceLevelLoad;
-                step = Mathf.SmoothStep(step, 1, Time.deltaTime * _reachTimeMaxAngle);
+                step = 1;
+                preH = H;
+                preV = V;
                 return;
             }
-
-            if (0 < step) {
-                var diff2 = Time.timeSinceLevelLoad - stickNeutralStartTime;
-                var rate2 = diff2 / _decelerateTimeStickNeutral;
-
-                rate = diff / (_reachTimeNeutralAngle + (_reachTimeNeutralAngle / 1.5f) * rate2);
-                pos = _increaseCurve.Evaluate(rate);
-                transform.rotation = Quaternion.Slerp(startRotation, Quaternion.Euler(lastAngle), pos);
-
-                if (diff2 >= _decelerateTimeStickNeutral) {
-                    startRotation = transform.rotation;
-                    startTime = Time.timeSinceLevelLoad;
-                    preStickDown = false;
-                    step = 0;
-                }
-                preInDir = inDir;
-                return;
-            }
-
            
-            transform.rotation = Quaternion.Slerp(startRotation, Quaternion.Euler(-_maxAngle, 0, 0), pos);
-            lastAngle = new Vector3(-_maxAngle, 0, 0);
+            lastAngle.x = -_maxAngle;
 
+            if (H < -_horDeadZone && isStickInput && !(preH < -_horDeadZone)) {
+                // 追加左入力があったら、左手前に傾けられるようにする
+                //lastAngle.z = _maxAngle;
+                stickNeutralStartTime = Time.timeSinceLevelLoad;
+                step = 1;
+                preH = H;
+                preV = V;
+
+            } else if (_horDeadZone < H && isStickInput && !(_horDeadZone < -preH)) {
+                // 追加右入力があったら、右手前に傾けられるようにする
+                //lastAngle.z = -_maxAngle;
+                stickNeutralStartTime = Time.timeSinceLevelLoad;
+                step = 1;
+                preH = H;
+                preV = V;
+            }
+
+            transform.rotation = Quaternion.Slerp(startRotation, Quaternion.Euler(lastAngle), pos);
 
         }
 
         // 左入力
-        else if ( H < -_horDeadZone && !isStickReleased) {
+        else if ( H < -_horDeadZone && isStickInput) {
 
             inDir = InputDirection.Left;
 
             var diff = Time.timeSinceLevelLoad - startTime;
             var rate = diff / _reachTimeNeutralAngle;
             var pos = _increaseCurve.Evaluate(rate);
+            dbgpos = pos;
 
             if (preInDir != InputDirection.Left && preInDir != InputDirection.None) {
                 stickNeutralStartTime = Time.timeSinceLevelLoad;
-                step = Mathf.SmoothStep(step, 1, Time.deltaTime * _reachTimeMaxAngle);
+                step = 1;
+                preH = H;
+                preV = V;
                 return;
             }
-
-            if (0 < step) {
-                var diff2 = Time.timeSinceLevelLoad - stickNeutralStartTime;
-                var rate2 = diff2 / _decelerateTimeStickNeutral;
-
-                rate = diff / (_reachTimeNeutralAngle + (_reachTimeNeutralAngle / 1.5f) * rate2);
-                pos = _increaseCurve.Evaluate(rate);
-                transform.rotation = Quaternion.Slerp(startRotation, Quaternion.Euler(lastAngle), pos);
-
-                if (diff2 >= _decelerateTimeStickNeutral) {
-                    startRotation = transform.rotation;
-                    startTime = Time.timeSinceLevelLoad;
-                    preStickDown = false;
-                    step = 0;
-                }
-                preInDir = inDir;
-                return;
-            }
-
-
             
-            transform.rotation = Quaternion.Slerp(startRotation, Quaternion.Euler(0, 0, _maxAngle), pos);
-            lastAngle = new Vector3(0, 0, _maxAngle);
+            lastAngle.z = _maxAngle;
 
+            if ( _verDeadZone < V && isStickInput && !(_verDeadZone < preV)) {
+                // 追加上入力があったら、左奥に傾けられるようにする
+                //lastAngle.x = _maxAngle;
+                stickNeutralStartTime = Time.timeSinceLevelLoad;
+                step = 1;
+                preH = H;
+                preV = V;
+
+            } else if ( V < -_verDeadZone && isStickInput && !(preV < -_verDeadZone)) {
+                // 追加下入力があったら、左手前に傾けられるようにする
+                //lastAngle.x = -_maxAngle;
+                stickNeutralStartTime = Time.timeSinceLevelLoad;
+                step = 1;
+                preH = H;
+                preV = V;
+            }
+
+            transform.rotation = Quaternion.Slerp(startRotation, Quaternion.Euler(lastAngle), pos);
 
         }
         // 右入力
-        else if ( _horDeadZone < H && !isStickReleased) {
+        else if ( _horDeadZone < H && isStickInput) {
             inDir = InputDirection.Right;
 
             var diff = Time.timeSinceLevelLoad - startTime;
             var rate = diff / _reachTimeNeutralAngle;
             var pos = _increaseCurve.Evaluate(rate);
+            dbgpos = pos;
 
             if (preInDir != InputDirection.Right && preInDir != InputDirection.None) {
                 stickNeutralStartTime = Time.timeSinceLevelLoad;
-                step = Mathf.SmoothStep(step, 1, Time.deltaTime * _reachTimeMaxAngle);
+                step = 1;
+                preH = H;
+                preV = V;
                 return;
             }
-
-            if (0 < step) {
-                var diff2 = Time.timeSinceLevelLoad - stickNeutralStartTime;
-                var rate2 = diff2 / _decelerateTimeStickNeutral;
-
-                rate = diff / (_reachTimeNeutralAngle + (_reachTimeNeutralAngle / 1.5f) * rate2);
-                pos = _increaseCurve.Evaluate(rate);
-                transform.rotation = Quaternion.Slerp(startRotation, Quaternion.Euler(lastAngle), pos);
-
-                if (diff2 >= _decelerateTimeStickNeutral) {
-                    startRotation = transform.rotation;
-                    startTime = Time.timeSinceLevelLoad;
-                    preStickDown = false;
-                    step = 0;
-                }
-                preInDir = inDir;
-                return;
-            }
-
-
             
-            transform.rotation = Quaternion.Slerp(startRotation, Quaternion.Euler(0, 0, -_maxAngle), pos);
-            lastAngle = new Vector3(0, 0, -_maxAngle);
+            lastAngle.z = -_maxAngle;
 
+            if (_verDeadZone < V && isStickInput && !(_verDeadZone < preV)) {
+                // 追加上入力があったら、右奥に傾けられるようにする
+                //lastAngle.x = _maxAngle;
+                stickNeutralStartTime = Time.timeSinceLevelLoad;
+                step = 1;
+                preH = H;
+                preV = V;
+
+            } else if (V < -_verDeadZone && isStickInput && !(preV < -_verDeadZone)) {
+                // 追加下入力があったら、右手前に傾けられるようにする
+                //lastAngle.x = -_maxAngle;
+                stickNeutralStartTime = Time.timeSinceLevelLoad;
+                step = 1;
+                preH = H;
+                preV = V;
+            }
+
+            transform.rotation = Quaternion.Slerp(startRotation, Quaternion.Euler(lastAngle), pos);
 
         }
 
@@ -258,7 +272,6 @@ public class FloorControll : MonoBehaviour
             && _horDeadZone > H || 0 < step) {
 
             inDir = InputDirection.None;
-            
 
             if (preStickDown) {
                 stickNeutralStartTime = Time.timeSinceLevelLoad;
@@ -272,12 +285,13 @@ public class FloorControll : MonoBehaviour
                 var rate2 = diff2 / _decelerateTimeStickNeutral;
 
                 var diff = Time.timeSinceLevelLoad - startTime;
-                var rate = diff / (_reachTimeNeutralAngle + (_reachTimeNeutralAngle / 1.5f) * rate2);
+                var rate = diff / (_reachTimeNeutralAngle + (_reachTimeNeutralAngle / 2) * rate2);
                 
                 var pos = _increaseCurve.Evaluate(rate);
+                dbgpos = pos;
 
                 transform.rotation = Quaternion.Slerp(startRotation, Quaternion.Euler(lastAngle), pos);
-                isStickReleased = true;
+                isStickInput = false;
 
                 if(diff2 >= _decelerateTimeStickNeutral) {
                     isReturnHorizontal = true;
@@ -299,33 +313,21 @@ public class FloorControll : MonoBehaviour
 
                 var rate = diff / _reachTimeNeutralAngle;
                 var pos = _increaseCurve.Evaluate(rate);
-                
-                transform.rotation = Quaternion.Slerp(startRotation, Quaternion.Euler(0, 0, 0), pos);
-                isStickReleased = false;
 
+                transform.rotation = Quaternion.Slerp(startRotation, Quaternion.Euler(0, 0, 0), pos);
+                isStickInput = true;
                 
             }
             
         }
 
         preInDir = inDir;
+        preH = H;
+        preV = V;
     }
 
     private void OnGUI()
     {
-        if (!isReturnHorizontal && 0 < step) {
-            var diff2 = Time.timeSinceLevelLoad - stickNeutralStartTime;
-            var rate2 = diff2 / _decelerateTimeStickNeutral;
-
-            var diff = Time.timeSinceLevelLoad - startTime;
-            var rate = diff / (_reachTimeNeutralAngle + (_reachTimeNeutralAngle / 2) * rate2);
-            GUI.Label(new Rect(0, 180, 500, 100), "diff: " + diff, style);
-            GUI.Label(new Rect(0, 230, 500, 100), "rate: " + rate, style);
-            GUI.Label(new Rect(0, 280, 500, 100), "diff2: " + diff2, style);
-            GUI.Label(new Rect(0, 330, 500, 100), "rate2: " + rate2, style);
-        }
-
-
-
+        GUI.Label(new Rect(0, 180, 500, 300), "入力方向 : " + inDir, style);
     }
 }
