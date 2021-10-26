@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class BallControll : MonoBehaviour
 {
@@ -8,6 +9,8 @@ public class BallControll : MonoBehaviour
     private Rigidbody rb;
 
     private int itemCount;
+
+    public GameObject GameClearText;
 
     void Start()
     {
@@ -27,6 +30,15 @@ public class BallControll : MonoBehaviour
             if (rb) {
                 rb.velocity = Vector3.zero;
             }
+        }
+    }
+
+    void FixedUpdate()
+    {
+        if (itemCount == 12)
+        {
+            GameClearText.SetActive(true);
+            Time.timeScale = 0; 
         }
     }
 
