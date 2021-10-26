@@ -34,6 +34,7 @@ public class FloorControll : MonoBehaviour
     private bool isReturnHorizontal = false;    // 水平に戻ろうとしているか
     private bool preStickDown = false;  // 前のフレームでスティックを倒していたか
     private Quaternion startRotation;       // 床をn秒かけて倒すとき、倒し始めたフレームの床の角度
+    private int go = 0;
 
     private GUIStyle style;                 // デバッグ表示用
 
@@ -57,6 +58,8 @@ public class FloorControll : MonoBehaviour
             (V < -_verDeadZone && isStickInput) ||
             (H < -_horDeadZone && isStickInput) ||
             (_horDeadZone < H && isStickInput)) {
+
+            go = 0;
 
             // 前フレームでスティックを倒していなかったとき
             if (!preStickDown) {
@@ -95,6 +98,27 @@ public class FloorControll : MonoBehaviour
                     startTime = Time.timeSinceLevelLoad;
                     preStickDown = false;
                     step = 0;
+
+                    if(inDir == InputDirection.Up || inDir == InputDirection.Down) {
+                        lastAngle.x = transform.rotation.x;
+
+                        if(H < -_horDeadZone) {
+                            lastAngle.z = _maxAngle;
+                        } else if (_horDeadZone < H) {
+                            lastAngle.z = -_maxAngle;
+                        }
+
+                    } else if (inDir == InputDirection.Left || inDir == InputDirection.Right) {
+                        lastAngle.z = transform.rotation.z;
+
+                        if (V < -_verDeadZone) {
+                            lastAngle.x = _maxAngle;
+                        } else if (_verDeadZone < V) {
+                            lastAngle.x = -_maxAngle;
+                        }
+                    }
+
+                    
                 }
 
                 preInDir = inDir;
@@ -106,7 +130,7 @@ public class FloorControll : MonoBehaviour
         }
 
         // 上入力
-        if      ( _verDeadZone < V && isStickInput) {
+        if      ( _verDeadZone < V && isStickInput && step <= 0) {
 
             inDir = InputDirection.Up;
 
@@ -125,28 +149,32 @@ public class FloorControll : MonoBehaviour
             
             lastAngle.x = _maxAngle;
 
-            if( H < -_horDeadZone && isStickInput && !(preH < -_horDeadZone)) {
+            if( H < -_horDeadZone && isStickInput && -_horDeadZone < preH) {
                 // 追加左入力があったら、左奥に傾けられるようにする
-                //lastAngle.z = _maxAngle;
+                
                 stickNeutralStartTime = Time.timeSinceLevelLoad;
                 step = 1;
                 preH = H;
                 preV = V;
+                
+                return;
 
-            } else if ( _horDeadZone < H && isStickInput && !(_horDeadZone < -preH)) {
+            } else if ( _horDeadZone < H && isStickInput && preH < _horDeadZone ) {
                 // 追加右入力があったら、右奥に傾けられるようにする
-                //lastAngle.z = -_maxAngle;
+                
                 stickNeutralStartTime = Time.timeSinceLevelLoad;
                 step = 1;
                 preH = H;
                 preV = V;
+                return;
+
             }
 
             transform.rotation = Quaternion.Slerp(startRotation, Quaternion.Euler(lastAngle), pos);
 
         }
         // 下入力
-        else if ( V < -_verDeadZone && isStickInput) {
+        else if ( V < -_verDeadZone && isStickInput && step <= 0) {
             inDir = InputDirection.Down;
 
             var diff = Time.timeSinceLevelLoad - startTime;
@@ -164,21 +192,23 @@ public class FloorControll : MonoBehaviour
            
             lastAngle.x = -_maxAngle;
 
-            if (H < -_horDeadZone && isStickInput && !(preH < -_horDeadZone)) {
+            if (H < -_horDeadZone && isStickInput && -_horDeadZone < preH) {
                 // 追加左入力があったら、左手前に傾けられるようにする
                 //lastAngle.z = _maxAngle;
                 stickNeutralStartTime = Time.timeSinceLevelLoad;
                 step = 1;
                 preH = H;
                 preV = V;
+                return;
 
-            } else if (_horDeadZone < H && isStickInput && !(_horDeadZone < -preH)) {
+            } else if (_horDeadZone < H && isStickInput && preH < _horDeadZone) {
                 // 追加右入力があったら、右手前に傾けられるようにする
                 //lastAngle.z = -_maxAngle;
                 stickNeutralStartTime = Time.timeSinceLevelLoad;
                 step = 1;
                 preH = H;
                 preV = V;
+                return;
             }
 
             transform.rotation = Quaternion.Slerp(startRotation, Quaternion.Euler(lastAngle), pos);
@@ -186,7 +216,7 @@ public class FloorControll : MonoBehaviour
         }
 
         // 左入力
-        else if ( H < -_horDeadZone && isStickInput) {
+        else if ( H < -_horDeadZone && isStickInput && step <= 0) {
 
             inDir = InputDirection.Left;
 
@@ -205,28 +235,30 @@ public class FloorControll : MonoBehaviour
             
             lastAngle.z = _maxAngle;
 
-            if ( _verDeadZone < V && isStickInput && !(_verDeadZone < preV)) {
+            if ( _verDeadZone < V && isStickInput && preV < _verDeadZone) {
                 // 追加上入力があったら、左奥に傾けられるようにする
                 //lastAngle.x = _maxAngle;
                 stickNeutralStartTime = Time.timeSinceLevelLoad;
                 step = 1;
                 preH = H;
                 preV = V;
+                return;
 
-            } else if ( V < -_verDeadZone && isStickInput && !(preV < -_verDeadZone)) {
+            } else if ( V < -_verDeadZone && isStickInput && -_verDeadZone < preV) {
                 // 追加下入力があったら、左手前に傾けられるようにする
                 //lastAngle.x = -_maxAngle;
                 stickNeutralStartTime = Time.timeSinceLevelLoad;
                 step = 1;
                 preH = H;
                 preV = V;
+                return;
             }
 
             transform.rotation = Quaternion.Slerp(startRotation, Quaternion.Euler(lastAngle), pos);
 
         }
         // 右入力
-        else if ( _horDeadZone < H && isStickInput) {
+        else if ( _horDeadZone < H && isStickInput && step <= 0) {
             inDir = InputDirection.Right;
 
             var diff = Time.timeSinceLevelLoad - startTime;
@@ -244,21 +276,23 @@ public class FloorControll : MonoBehaviour
             
             lastAngle.z = -_maxAngle;
 
-            if (_verDeadZone < V && isStickInput && !(_verDeadZone < preV)) {
+            if (_verDeadZone < V && isStickInput && preV < _verDeadZone) {
                 // 追加上入力があったら、右奥に傾けられるようにする
                 //lastAngle.x = _maxAngle;
                 stickNeutralStartTime = Time.timeSinceLevelLoad;
                 step = 1;
                 preH = H;
                 preV = V;
+                return;
 
-            } else if (V < -_verDeadZone && isStickInput && !(preV < -_verDeadZone)) {
+            } else if (V < -_verDeadZone && isStickInput && -_verDeadZone < preV) {
                 // 追加下入力があったら、右手前に傾けられるようにする
                 //lastAngle.x = -_maxAngle;
                 stickNeutralStartTime = Time.timeSinceLevelLoad;
                 step = 1;
                 preH = H;
                 preV = V;
+                return;
             }
 
             transform.rotation = Quaternion.Slerp(startRotation, Quaternion.Euler(lastAngle), pos);
@@ -281,6 +315,7 @@ public class FloorControll : MonoBehaviour
 
             // 傾ける力がまだ残っていたら、それを0に戻す
             if (!isReturnHorizontal && 0 < step) {
+                go = 1;
                 var diff2 = Time.timeSinceLevelLoad - stickNeutralStartTime;
                 var rate2 = diff2 / _decelerateTimeStickNeutral;
 
@@ -298,12 +333,34 @@ public class FloorControll : MonoBehaviour
                     startTime = Time.timeSinceLevelLoad;
                     startRotation = transform.rotation;
                     step = 0;
+                    go = 55;
+                    preInDir = inDir;
+                    preH = H;
+                    preV = V;
+                    isStickInput = true;
+
+                    if (H < -_horDeadZone) {
+                        lastAngle.z = _maxAngle;
+                    } else if (_horDeadZone < H) {
+                        lastAngle.z = -_maxAngle;
+                    }
+
+                    if (V < -_verDeadZone) {
+                        lastAngle.x = _maxAngle;
+                    } else if (_verDeadZone < V) {
+                        lastAngle.x = -_maxAngle;
+                    }
+
+                    return;
                 }
             }
 
             // 傾ける力がなくなったら、水平に戻る
             if(isReturnHorizontal) {
+                go = 2;
                 var diff = Time.timeSinceLevelLoad - startTime;
+
+                lastAngle = Vector3.zero;
 
                 if (diff >= _reachTimeNeutralAngle) {
                     transform.rotation = Quaternion.Slerp(startRotation, Quaternion.Euler(0, 0, 0), 1);
@@ -328,6 +385,17 @@ public class FloorControll : MonoBehaviour
 
     private void OnGUI()
     {
+        // スティック入力を変数に入れてタイピングの手間を省く
+        float H = Input.GetAxis("Horizontal");
+        float V = Input.GetAxis("Vertical");
+
         GUI.Label(new Rect(0, 180, 500, 300), "入力方向 : " + inDir, style);
+        GUI.Label(new Rect(0, 230, 500, 300), "H : " + H, style);
+        GUI.Label(new Rect(0, 280, 500, 300), "V : " + V, style);
+        GUI.Label(new Rect(0, 330, 500, 300), "preH : " + preH, style);
+        GUI.Label(new Rect(0, 380, 500, 300), "preV : " + preV, style);
+        GUI.Label(new Rect(0, 430, 500, 300), "lastAngle : " + lastAngle, style);
+        GUI.Label(new Rect(0, 480, 500, 300), "step : " + step, style);
+        GUI.Label(new Rect(0, 530, 500, 300), "go : " + go, style);
     }
 }
