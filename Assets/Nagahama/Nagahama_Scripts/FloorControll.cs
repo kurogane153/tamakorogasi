@@ -63,13 +63,19 @@ public class FloorControll : MonoBehaviour
 
             // 前フレームでスティックを倒していなかったとき
             if (!preStickDown) {
-                if(step <= 0) {
+                if(step <= 0 && !isReturnHorizontal) {
                     startRotation = transform.rotation;
                     startTime = Time.timeSinceLevelLoad;
                 }
                 
                 preStickDown = true;
                 
+            }
+
+            if (isReturnHorizontal) {
+                stickNeutralStartTime = Time.timeSinceLevelLoad;
+                step = 1;
+
             }
 
             isStickInput = true;        
@@ -357,7 +363,7 @@ public class FloorControll : MonoBehaviour
 
             inDir = InputDirection.None;
 
-            if (preStickDown) {
+            if (preStickDown && step <= 0) {
                 stickNeutralStartTime = Time.timeSinceLevelLoad;
                 preStickDown = false;
                 step = 1;
@@ -382,27 +388,68 @@ public class FloorControll : MonoBehaviour
                     isReturnHorizontal = true;
                     startTime = Time.timeSinceLevelLoad;
                     startRotation = transform.rotation;
-                    step = 0;
+                    step = 1;
                     go = 55;
                     preInDir = inDir;
                     preH = H;
                     preV = V;
                     isStickInput = true;
 
-                    if (H < -_horDeadZone) {
-                        lastAngle.z = _maxAngle;
-                    } else if (_horDeadZone < H) {
-                        lastAngle.z = -_maxAngle;
-                    } else {
-                        lastAngle.z = 0;
-                    }
+                    if (inDir == InputDirection.Up || inDir == InputDirection.Down) {
+                        lastAngle.x = transform.rotation.x;
 
-                    if (V < -_verDeadZone) {
-                        lastAngle.x = _maxAngle;
-                    } else if (_verDeadZone < V) {
-                        lastAngle.x = -_maxAngle;
-                    } else {
-                        lastAngle.x = 0;
+                        if (H < -_horDeadZone) {
+                            lastAngle.z = _maxAngle;
+
+                            if (_verDeadZone > V && V > -_verDeadZone) {
+                                inDir = InputDirection.Left;
+                            }
+
+                        } else if (_horDeadZone < H) {
+                            lastAngle.z = -_maxAngle;
+
+                            if (_verDeadZone > V && V > -_verDeadZone) {
+                                inDir = InputDirection.Right;
+                            }
+
+                        } else {
+                            lastAngle.z = 0;
+
+
+                        }
+
+                        if (V < -_verDeadZone) {
+                            lastAngle.x = _maxAngle;
+                            inDir = InputDirection.Down;
+
+
+                        } else if (_verDeadZone < V) {
+                            lastAngle.x = -_maxAngle;
+                            inDir = InputDirection.Up;
+
+
+                        }
+
+                    } else if (inDir == InputDirection.Left || inDir == InputDirection.Right) {
+                        lastAngle.z = transform.rotation.z;
+
+                        if (V < -_verDeadZone) {
+                            lastAngle.x = _maxAngle;
+
+                            if (_horDeadZone > H && H > -_horDeadZone) {
+                                inDir = InputDirection.Down;
+                            }
+
+                        } else if (_verDeadZone < V) {
+                            lastAngle.x = -_maxAngle;
+
+                            if (_horDeadZone > H && H > -_horDeadZone) {
+                                inDir = InputDirection.Up;
+                            }
+
+                        } else {
+                            lastAngle.x = 0;
+                        }
                     }
 
                     return;
@@ -410,14 +457,19 @@ public class FloorControll : MonoBehaviour
             }
 
             // 傾ける力がなくなったら、水平に戻る
-            if(isReturnHorizontal) {
+            if(isReturnHorizontal && 0 < step) {
                 go = 2;
                 var diff = Time.timeSinceLevelLoad - startTime;
 
                 lastAngle = Vector3.zero;
 
                 if (diff >= _reachTimeNeutralAngle) {
-                    transform.rotation = Quaternion.Slerp(startRotation, Quaternion.Euler(0, 0, 0), 1);
+                    
+                    transform.rotation = Quaternion.Slerp(startRotation, Quaternion.Euler(lastAngle), 1);
+                    startTime = Time.timeSinceLevelLoad;
+                    startRotation = transform.rotation;
+                    step = 0;
+
                     Debug.Log(diff);
                     isReturnHorizontal = false;
                 }
@@ -425,7 +477,7 @@ public class FloorControll : MonoBehaviour
                 var rate = diff / _reachTimeNeutralAngle;
                 var pos = _increaseCurve.Evaluate(rate);
 
-                transform.rotation = Quaternion.Slerp(startRotation, Quaternion.Euler(0, 0, 0), pos);
+                transform.rotation = Quaternion.Slerp(startRotation, Quaternion.Euler(lastAngle), pos);
                 isStickInput = true;
                 
             }
@@ -440,16 +492,16 @@ public class FloorControll : MonoBehaviour
     private void OnGUI()
     {
         // スティック入力を変数に入れてタイピングの手間を省く
-        //float H = Input.GetAxis("Horizontal");
-        //float V = Input.GetAxis("Vertical");
+        float H = Input.GetAxis("Horizontal");
+        float V = Input.GetAxis("Vertical");
         
-        //GUI.Label(new Rect(0, 180, 500, 300), "入力方向 : " + inDir, style);
-        //GUI.Label(new Rect(0, 230, 500, 300), "H : " + H, style);
-        //GUI.Label(new Rect(0, 280, 500, 300), "V : " + V, style);
-        //GUI.Label(new Rect(0, 330, 500, 300), "preH : " + preH, style);
-        //GUI.Label(new Rect(0, 380, 500, 300), "preV : " + preV, style);
-        //GUI.Label(new Rect(0, 430, 500, 300), "lastAngle : " + lastAngle, style);
-        //GUI.Label(new Rect(0, 480, 500, 300), "step : " + step, style);
-        //GUI.Label(new Rect(0, 530, 500, 300), "go : " + go, style);
+        GUI.Label(new Rect(0, 180, 500, 300), "入力方向 : " + inDir, style);
+        GUI.Label(new Rect(0, 230, 500, 300), "H : " + H, style);
+        GUI.Label(new Rect(0, 280, 500, 300), "V : " + V, style);
+        GUI.Label(new Rect(0, 330, 500, 300), "preH : " + preH, style);
+        GUI.Label(new Rect(0, 380, 500, 300), "preV : " + preV, style);
+        GUI.Label(new Rect(0, 430, 500, 300), "lastAngle : " + lastAngle, style);
+        GUI.Label(new Rect(0, 480, 500, 300), "step : " + step, style);
+        GUI.Label(new Rect(0, 530, 500, 300), "go : " + go, style);
     }
 }

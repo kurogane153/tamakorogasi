@@ -217,6 +217,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7ccdbf55ebaba1d4aaff8815d175338f, type: 3}
+--- !u!1 &130774168 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6868359757583664025, guid: e3a69b9767d0af5418bb824d3dfcde54,
+    type: 3}
+  m_PrefabInstance: {fileID: 175481346}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &169155376
 GameObject:
   m_ObjectHideFlags: 0
@@ -649,7 +655,7 @@ MonoBehaviour:
   _horDeadZone: 0.3
   _verDeadZone: 0.3
   _reachTimeMaxAngle: 1.5
-  _decelerateTimeStickNeutral: 0.5
+  _decelerateTimeStickNeutral: 1
   _reachTimeNeutralAngle: 1.5
   _maxAngle: 30
   _increaseCurve:
@@ -1291,7 +1297,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76c392e42b5098c458856cdf6ecaaaa1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_FirstSelected: {fileID: 0}
+  m_FirstSelected: {fileID: 130774168}
   m_sendNavigationEvents: 1
   m_DragThreshold: 10
 --- !u!4 &1585612071
