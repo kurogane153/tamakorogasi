@@ -104,8 +104,34 @@ public class FloorControll : MonoBehaviour
 
                         if(H < -_horDeadZone) {
                             lastAngle.z = _maxAngle;
+
+                            if(_verDeadZone > V && V > -_verDeadZone) {
+                                inDir = InputDirection.Left;
+                            }
+
                         } else if (_horDeadZone < H) {
                             lastAngle.z = -_maxAngle;
+
+                            if (_verDeadZone > V && V > -_verDeadZone) {
+                                inDir = InputDirection.Right;
+                            }
+
+                        } else {
+                            lastAngle.z = 0;
+
+                            
+                        }
+
+                        if (V < -_verDeadZone) {
+                            lastAngle.x = _maxAngle;
+                            inDir = InputDirection.Down;
+
+
+                        } else if (_verDeadZone < V) {
+                            lastAngle.x = -_maxAngle;
+                            inDir = InputDirection.Up;
+
+
                         }
 
                     } else if (inDir == InputDirection.Left || inDir == InputDirection.Right) {
@@ -113,8 +139,20 @@ public class FloorControll : MonoBehaviour
 
                         if (V < -_verDeadZone) {
                             lastAngle.x = _maxAngle;
+
+                            if (_horDeadZone > H && H > -_horDeadZone) {
+                                inDir = InputDirection.Down;
+                            }
+
                         } else if (_verDeadZone < V) {
                             lastAngle.x = -_maxAngle;
+
+                            if (_horDeadZone > H && H > -_horDeadZone) {
+                                inDir = InputDirection.Up;
+                            }
+
+                        } else {
+                            lastAngle.x = 0;
                         }
                     }
 
@@ -168,6 +206,12 @@ public class FloorControll : MonoBehaviour
                 preV = V;
                 return;
 
+            } else if ( (preH < -_horDeadZone || _horDeadZone < preH) && isStickInput && -_horDeadZone < H && H < _horDeadZone) {
+                stickNeutralStartTime = Time.timeSinceLevelLoad;
+                step = 1;
+                preH = H;
+                preV = V;
+                return;
             }
 
             transform.rotation = Quaternion.Slerp(startRotation, Quaternion.Euler(lastAngle), pos);
@@ -204,6 +248,12 @@ public class FloorControll : MonoBehaviour
             } else if (_horDeadZone < H && isStickInput && preH < _horDeadZone) {
                 // 追加右入力があったら、右手前に傾けられるようにする
                 //lastAngle.z = -_maxAngle;
+                stickNeutralStartTime = Time.timeSinceLevelLoad;
+                step = 1;
+                preH = H;
+                preV = V;
+                return;
+            } else if ((preH < -_horDeadZone || _horDeadZone < preH) && isStickInput && -_horDeadZone < H && H < _horDeadZone) {
                 stickNeutralStartTime = Time.timeSinceLevelLoad;
                 step = 1;
                 preH = H;
@@ -268,7 +318,7 @@ public class FloorControll : MonoBehaviour
 
             if (preInDir != InputDirection.Right && preInDir != InputDirection.None) {
                 stickNeutralStartTime = Time.timeSinceLevelLoad;
-                step = 1;
+                step = 114514;
                 preH = H;
                 preV = V;
                 return;
@@ -303,7 +353,7 @@ public class FloorControll : MonoBehaviour
         if( _verDeadZone > V 
             && V > -_verDeadZone 
             && H > -_horDeadZone 
-            && _horDeadZone > H || 0 < step) {
+            && _horDeadZone > H || go == 1) {
 
             inDir = InputDirection.None;
 
@@ -343,12 +393,16 @@ public class FloorControll : MonoBehaviour
                         lastAngle.z = _maxAngle;
                     } else if (_horDeadZone < H) {
                         lastAngle.z = -_maxAngle;
+                    } else {
+                        lastAngle.z = 0;
                     }
 
                     if (V < -_verDeadZone) {
                         lastAngle.x = _maxAngle;
                     } else if (_verDeadZone < V) {
                         lastAngle.x = -_maxAngle;
+                    } else {
+                        lastAngle.x = 0;
                     }
 
                     return;
@@ -386,16 +440,16 @@ public class FloorControll : MonoBehaviour
     private void OnGUI()
     {
         // スティック入力を変数に入れてタイピングの手間を省く
-        float H = Input.GetAxis("Horizontal");
-        float V = Input.GetAxis("Vertical");
-
-        GUI.Label(new Rect(0, 180, 500, 300), "入力方向 : " + inDir, style);
-        GUI.Label(new Rect(0, 230, 500, 300), "H : " + H, style);
-        GUI.Label(new Rect(0, 280, 500, 300), "V : " + V, style);
-        GUI.Label(new Rect(0, 330, 500, 300), "preH : " + preH, style);
-        GUI.Label(new Rect(0, 380, 500, 300), "preV : " + preV, style);
-        GUI.Label(new Rect(0, 430, 500, 300), "lastAngle : " + lastAngle, style);
-        GUI.Label(new Rect(0, 480, 500, 300), "step : " + step, style);
-        GUI.Label(new Rect(0, 530, 500, 300), "go : " + go, style);
+        //float H = Input.GetAxis("Horizontal");
+        //float V = Input.GetAxis("Vertical");
+        
+        //GUI.Label(new Rect(0, 180, 500, 300), "入力方向 : " + inDir, style);
+        //GUI.Label(new Rect(0, 230, 500, 300), "H : " + H, style);
+        //GUI.Label(new Rect(0, 280, 500, 300), "V : " + V, style);
+        //GUI.Label(new Rect(0, 330, 500, 300), "preH : " + preH, style);
+        //GUI.Label(new Rect(0, 380, 500, 300), "preV : " + preV, style);
+        //GUI.Label(new Rect(0, 430, 500, 300), "lastAngle : " + lastAngle, style);
+        //GUI.Label(new Rect(0, 480, 500, 300), "step : " + step, style);
+        //GUI.Label(new Rect(0, 530, 500, 300), "go : " + go, style);
     }
 }
