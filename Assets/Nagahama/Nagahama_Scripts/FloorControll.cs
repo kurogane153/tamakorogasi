@@ -355,8 +355,10 @@ public class FloorControll : MonoBehaviour
 
         }
 
+        
+
         // 入力なし
-        if( _verDeadZone > V 
+        if ( _verDeadZone > V 
             && V > -_verDeadZone 
             && H > -_horDeadZone 
             && _horDeadZone > H || go == 1) {
@@ -395,8 +397,20 @@ public class FloorControll : MonoBehaviour
                     preV = V;
                     isStickInput = true;
 
-                    if (inDir == InputDirection.Up || inDir == InputDirection.Down) {
+                    if ((_verDeadZone < V && isStickInput) ||
+                        (V < -_verDeadZone && isStickInput) ||
+                        (H < -_horDeadZone && isStickInput) ||
+                        (_horDeadZone < H && isStickInput)) {
+
+                        isReturnHorizontal = false;
+
+                    }
+
+
+                    if ((_verDeadZone < V && isStickInput) ||
+                        (V < -_verDeadZone && isStickInput) ) {
                         lastAngle.x = transform.rotation.x;
+                        
 
                         if (H < -_horDeadZone) {
                             lastAngle.z = _maxAngle;
@@ -430,8 +444,9 @@ public class FloorControll : MonoBehaviour
 
                         }
 
-                    } else if (inDir == InputDirection.Left || inDir == InputDirection.Right) {
+                    } else if ((H < -_horDeadZone && isStickInput) || (_horDeadZone < H && isStickInput)) {
                         lastAngle.z = transform.rotation.z;
+                        
 
                         if (V < -_verDeadZone) {
                             lastAngle.x = _maxAngle;
@@ -492,16 +507,16 @@ public class FloorControll : MonoBehaviour
     private void OnGUI()
     {
         // スティック入力を変数に入れてタイピングの手間を省く
-        float H = Input.GetAxis("Horizontal");
-        float V = Input.GetAxis("Vertical");
+        //float H = Input.GetAxis("Horizontal");
+        //float V = Input.GetAxis("Vertical");
         
-        GUI.Label(new Rect(0, 180, 500, 300), "入力方向 : " + inDir, style);
-        GUI.Label(new Rect(0, 230, 500, 300), "H : " + H, style);
-        GUI.Label(new Rect(0, 280, 500, 300), "V : " + V, style);
-        GUI.Label(new Rect(0, 330, 500, 300), "preH : " + preH, style);
-        GUI.Label(new Rect(0, 380, 500, 300), "preV : " + preV, style);
-        GUI.Label(new Rect(0, 430, 500, 300), "lastAngle : " + lastAngle, style);
-        GUI.Label(new Rect(0, 480, 500, 300), "step : " + step, style);
-        GUI.Label(new Rect(0, 530, 500, 300), "go : " + go, style);
+        //GUI.Label(new Rect(0, 180, 500, 300), "入力方向 : " + inDir, style);
+        //GUI.Label(new Rect(0, 230, 500, 300), "H : " + H, style);
+        //GUI.Label(new Rect(0, 280, 500, 300), "V : " + V, style);
+        //GUI.Label(new Rect(0, 330, 500, 300), "preH : " + preH, style);
+        //GUI.Label(new Rect(0, 380, 500, 300), "preV : " + preV, style);
+        //GUI.Label(new Rect(0, 430, 500, 300), "lastAngle : " + lastAngle, style);
+        //GUI.Label(new Rect(0, 480, 500, 300), "step : " + step, style);
+        //GUI.Label(new Rect(0, 530, 500, 300), "go : " + go, style);
     }
 }

@@ -6,6 +6,7 @@ public class ForceSelect : MonoBehaviour
 {
     [SerializeField] private bool _isEnableForceSelect;
     [SerializeField] private EventSystem eventSystem;
+    [SerializeField] private Image _firstSelectCursor;
     private Selectable selectable;
 
     private void Start()
@@ -20,6 +21,7 @@ public class ForceSelect : MonoBehaviour
                 selectable = GetComponent<Selectable>();
             }
             selectable.Select();
+            _firstSelectCursor.color = Color.white;
         }
     }
 

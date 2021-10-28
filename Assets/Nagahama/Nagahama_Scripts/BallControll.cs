@@ -25,12 +25,12 @@ public class BallControll : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetButtonDown("Cancel")) {
-            transform.position = startPos;
-            if (rb) {
-                rb.velocity = Vector3.zero;
-            }
-        }
+        //if (Input.GetButtonDown("Cancel")) {
+            //transform.position = startPos;
+            //if (rb) {
+                //rb.velocity = Vector3.zero;
+            //}
+        //}
     }
 
     void FixedUpdate()
