@@ -11,10 +11,13 @@ public class BallControll : MonoBehaviour
     private int itemCount;
 
     public GameObject GameClearText;
+    [SerializeField] private GameObject _resultPanel;
+    private GameManager gm;
 
     void Start()
     {
         startPos = transform.position;
+        gm = GameManager.Instance;
         rb = GetComponent<Rigidbody>();
         itemCount = 0;
         if (rb) {
@@ -37,8 +40,9 @@ public class BallControll : MonoBehaviour
     {
         if (itemCount == 12)
         {
-            GameClearText.SetActive(true);
-            Time.timeScale = 0; 
+            //GameClearText.SetActive(true);
+            _resultPanel.SetActive(true);
+            Time.timeScale = 0;
         }
     }
 
@@ -48,6 +52,7 @@ public class BallControll : MonoBehaviour
         {
             Debug.Log("すり抜けた！");
             itemCount++;
+            gm.CoinCount = itemCount;
             other.gameObject.SetActive(false);
             Debug.Log(itemCount);
         }

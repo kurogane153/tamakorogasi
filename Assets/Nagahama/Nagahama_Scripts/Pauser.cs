@@ -5,8 +5,8 @@ using System;
 public class Pauser : MonoBehaviour
 {
     public static List<Pauser> targets = new List<Pauser>();   // ポーズ対象のスクリプト
-    public static bool isPaused;
-    public static bool isCanNotPausing;
+    public static bool isPaused;            // ポーズボタンを押してのポーズ中か
+    public static bool isCanNotPausing;     // ポーズボタンを押してのポーズをしてもいいか
 
     [SerializeField] private bool _killCameraPause; // キルカメラ中に止ってほしいときやつだけオンにする
 

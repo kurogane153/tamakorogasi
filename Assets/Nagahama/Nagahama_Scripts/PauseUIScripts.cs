@@ -7,22 +7,13 @@ public class PauseUIScripts : MonoBehaviour
 {
     private bool isButtonPush;
 
-    void Start()
-    {
-        
-    }
-
-    void Update()
-    {
-        
-    }
-
     public void ChangeMainGameScene()
     {
         if (isButtonPush) return;
 
         isButtonPush = true;
         Pauser.Resume();
+        GameManager.Instance.StageScoreReset();
         SceneManager.LoadScene(1);
     }
 
@@ -32,6 +23,7 @@ public class PauseUIScripts : MonoBehaviour
 
         isButtonPush = true;
         Pauser.Resume();
+        GameManager.Instance.StageScoreReset();
         SceneManager.LoadScene(0);
     }
 

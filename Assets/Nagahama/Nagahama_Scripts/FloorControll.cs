@@ -39,16 +39,21 @@ public class FloorControll : MonoBehaviour
     private GUIStyle style;                 // デバッグ表示用
 
     private float dbgpos;                   // デバッグ表示用
+    private GameManager gm;
 
     void Start()
     {
         // デバッグ用
         style = new GUIStyle();
         style.fontSize = 30;
+        gm = GameManager.Instance;
     }
 
     private void FixedUpdate()
     {
+        // プレイ時間加算
+        gm.PlayTime += Time.deltaTime;
+
         // スティック入力を変数に入れてタイピングの手間を省く
         float H = Input.GetAxis("Horizontal");
         float V = Input.GetAxis("Vertical");
