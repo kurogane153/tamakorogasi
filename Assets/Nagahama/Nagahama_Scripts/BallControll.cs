@@ -12,6 +12,7 @@ public class BallControll : MonoBehaviour
 
     public GameObject GameClearText;
     [SerializeField] private GameObject _resultPanel;
+    [SerializeField] private GameObject _gameClearText;
     private GameManager gm;
 
     void Start()
@@ -20,6 +21,7 @@ public class BallControll : MonoBehaviour
         gm = GameManager.Instance;
         rb = GetComponent<Rigidbody>();
         itemCount = 0;
+        _gameClearText.SetActive(false);
         if (rb) {
             Debug.Log("ボールにRigidbodyがアタッチされている");
         }
@@ -41,8 +43,8 @@ public class BallControll : MonoBehaviour
         if (itemCount == 12)
         {
             //GameClearText.SetActive(true);
-            _resultPanel.SetActive(true);
-            Time.timeScale = 0;
+            
+            StartCoroutine(nameof(GameClear));
         }
     }
 
@@ -61,6 +63,16 @@ public class BallControll : MonoBehaviour
     public int GetItemCount()
     {
         return itemCount;
+    }
+
+    private IEnumerator GameClear()
+    {
+        _gameClearText.SetActive(true);
+        yield return new WaitForSeconds(1f);
+
+        _gameClearText.SetActive(false);
+        _resultPanel.SetActive(true);
+        Time.timeScale = 0;
     }
 
 }

@@ -16,6 +16,14 @@ public class TitleUIScripts : MonoBehaviour
         SceneManager.LoadScene(1);
     }
 
+    private void Update()
+    {
+        if (Input.anyKey) {
+            SceneManager.LoadScene(1);
+        }
+                
+    }
+
     public void QuitGame()
     {
         if (isButtonPush) return;
