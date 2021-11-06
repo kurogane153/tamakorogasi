@@ -13,6 +13,7 @@ public class BallControll : MonoBehaviour
     public GameObject GameClearText;
     [SerializeField] private GameObject _resultPanel;
     [SerializeField] private GameObject _gameClearText;
+    [SerializeField] private ParticleSystem _clearConfetti;
     private GameManager gm;
 
     void Start()
@@ -68,13 +69,14 @@ public class BallControll : MonoBehaviour
 
     private IEnumerator GameClear()
     {
+        _clearConfetti.Play();
         _gameClearText.SetActive(true);
         yield return new WaitForSeconds(1f);
 
         GetComponent<AudioSource>().enabled = false;
         _gameClearText.SetActive(false);
         _resultPanel.SetActive(true);
-        Time.timeScale = 0;
+        GameObject.FindObjectOfType<FloorControll>().enabled = false;
     }
 
 }

@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class BallSound : MonoBehaviour
 {
+    [SerializeField] private ParticleSystem _smokeParticle;
+
     // この値以上の速度が出ていたら転がっているゴロゴロ音を鳴らす
     [SerializeField] private float _rollingSoundPlaySpeed = 0.1f;
     [SerializeField] private float _rollingSoundStopWaitTime = 1f;
@@ -50,12 +52,18 @@ public class BallSound : MonoBehaviour
             if (!isFadein) FadeinStart(_fadeoutSeconds);
             debug = true;
             waitTime = 0;
+            if (!_smokeParticle.isEmitting) {
+                _smokeParticle.Play();
+            }
         } else {
             waitTime += Time.deltaTime;
             if(_rollingSoundStopWaitTime <= waitTime) {
                 if (!isFadeout) FadeoutStart(_fadeoutSeconds);
             }
-            
+            if (_smokeParticle.isEmitting) {
+                _smokeParticle.Stop();
+            }
+
             debug = false;
         }
 

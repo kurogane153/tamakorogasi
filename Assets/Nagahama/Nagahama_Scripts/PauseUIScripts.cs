@@ -15,6 +15,7 @@ public class PauseUIScripts : MonoBehaviour
         Pauser.Resume();
         GameManager.Instance.StageScoreReset();
         SceneManager.LoadScene(1);
+        Pauser.isCanNotPausing = false;
     }
 
     public void ChangeTitleScene()
@@ -25,6 +26,7 @@ public class PauseUIScripts : MonoBehaviour
         Pauser.Resume();
         GameManager.Instance.StageScoreReset();
         SceneManager.LoadScene(0);
+        Pauser.isCanNotPausing = false;
     }
 
     public void QuitGame()
