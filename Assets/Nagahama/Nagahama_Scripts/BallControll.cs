@@ -56,6 +56,7 @@ public class BallControll : MonoBehaviour
             itemCount++;
             gm.CoinCount = itemCount;
             other.gameObject.SetActive(false);
+            SoundManager.Instance.PlaySE(SE.Coin);
             Debug.Log(itemCount);
         }
         
@@ -70,6 +71,7 @@ public class BallControll : MonoBehaviour
         _gameClearText.SetActive(true);
         yield return new WaitForSeconds(1f);
 
+        GetComponent<AudioSource>().enabled = false;
         _gameClearText.SetActive(false);
         _resultPanel.SetActive(true);
         Time.timeScale = 0;

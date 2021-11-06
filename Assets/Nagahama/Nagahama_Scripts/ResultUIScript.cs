@@ -38,6 +38,7 @@ public class ResultUIScript : MonoBehaviour
         if (Input.GetButtonDown("Submit")) {
             _retryMenuPanel.SetActive(true);
             gameObject.SetActive(false);
+            SoundManager.Instance.PlaySystemSE(SystemSE.Decide);
         }
     }
 

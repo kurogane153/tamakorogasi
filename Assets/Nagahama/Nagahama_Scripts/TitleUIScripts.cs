@@ -19,6 +19,7 @@ public class TitleUIScripts : MonoBehaviour
     private void Update()
     {
         if (Input.anyKey) {
+            SoundManager.Instance.PlaySystemSE(SystemSE.Decide);
             SceneManager.LoadScene(1);
         }
                 

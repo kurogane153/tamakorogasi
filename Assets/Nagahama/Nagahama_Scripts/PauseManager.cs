@@ -7,13 +7,6 @@ public class PauseManager : MonoBehaviour
     [SerializeField] Menu[] menus;    
 
     //private AudioListener pauseAudioListener;
-
-    void Start()
-    {
-        
-
-    }
-
     
     void Update()
     {
@@ -24,6 +17,8 @@ public class PauseManager : MonoBehaviour
             } else {
                 _pausePanel.Open();
                 Pauser.Pause();
+                SoundManager.Instance.PauseBGM();
+                SoundManager.Instance.PauseSE();
                 //pauseAudioListener.enabled = true;
             }
         }
@@ -37,6 +32,8 @@ public class PauseManager : MonoBehaviour
             CloseMenu(menus[i]);
         }
         Pauser.Resume();
+        SoundManager.Instance.UnPauseBGM();
+        SoundManager.Instance.UnPauseSE();
     }
 
     public void CloseMenu(Menu menu)
