@@ -362,6 +362,8 @@ MonoBehaviour:
   _resultPanel: {fileID: 4597034475097962059}
   _gameClearText: {fileID: 1576198591}
   _clearConfetti: {fileID: 1419818476}
+  _shockWave: {fileID: 4002574306699927410, guid: 9f946f9de84ef14448d793da8b67fe3c,
+    type: 3}
 --- !u!114 &169155383
 MonoBehaviour:
   m_ObjectHideFlags: 0

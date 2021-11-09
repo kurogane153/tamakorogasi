@@ -14,7 +14,10 @@ public class BallControll : MonoBehaviour
     [SerializeField] private GameObject _resultPanel;
     [SerializeField] private GameObject _gameClearText;
     [SerializeField] private ParticleSystem _clearConfetti;
+    [SerializeField] private GameObject _shockWave;
     private GameManager gm;
+
+    private GUIStyle style;                 // デバッグ表示用
 
     void Start()
     {
@@ -26,7 +29,9 @@ public class BallControll : MonoBehaviour
         if (rb) {
             Debug.Log("ボールにRigidbodyがアタッチされている");
         }
-        
+        style = new GUIStyle();
+        style.fontSize = 30;
+
     }
 
     void Update()
@@ -49,6 +54,16 @@ public class BallControll : MonoBehaviour
         }
     }
 
+    private void OnCollisionEnter(Collision collision)
+    {
+        // 壁に衝突したとき、速度が一定以上なら、衝撃波エフェクトと衝突SEを鳴らす
+        if (collision.gameObject.CompareTag("Wall") && rb.velocity.magnitude >= 0.35f) {
+            Instantiate(_shockWave, transform.position, Quaternion.identity);
+            SoundManager.Instance.PlaySE(SE.Conflict);
+            
+        }
+    }
+
     void OnTriggerEnter(Collider other)
     {
         if(other.gameObject.tag == "Item")
@@ -62,6 +77,7 @@ public class BallControll : MonoBehaviour
         }
         
     }
+
     public int GetItemCount()
     {
         return itemCount;
@@ -77,6 +93,11 @@ public class BallControll : MonoBehaviour
         _gameClearText.SetActive(false);
         _resultPanel.SetActive(true);
         GameObject.FindObjectOfType<FloorControll>().enabled = false;
+    }
+
+    private void OnGUI()
+    {
+        GUI.Label(new Rect(0, 180, 500, 300), "magnitude : " + rb.velocity.magnitude, style);
     }
 
 }

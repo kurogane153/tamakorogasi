@@ -122,6 +122,6 @@ public class BallSound : MonoBehaviour
 
     private void OnGUI()
     {
-        GUI.Label(new Rect(0, 180, 500, 300), "DEBUG : " + debug, style);
+        //GUI.Label(new Rect(0, 180, 500, 300), "DEBUG : " + debug, style);
     }
 }
