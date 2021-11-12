@@ -20,6 +20,9 @@ public class GameStartCountDown : MonoBehaviour
         floorControll = FindObjectOfType<FloorControll>();  // シーンからFloorControll 取得
         floorControll.enabled = false;                      // FloorControll 非アクティブにする
 
+        // ポーズできないようにする
+        Pauser.isCanNotPausing = true;
+
         // 非表示にしておく
         image.enabled = false;
         countDownText.enabled = false;
@@ -53,6 +56,9 @@ public class GameStartCountDown : MonoBehaviour
         countDownText.text = "スタート！";
         sm.PlaySE(SE.Start);
         yield return new WaitForSeconds(0.5f);
+
+        // ポーズできるようにする
+        Pauser.isCanNotPausing = false;
 
         // BGM再生開始
         sm.PlayBGM(0);
