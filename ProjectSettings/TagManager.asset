@@ -7,6 +7,8 @@ TagManager:
   - Item
   - Wall
   - SoundManager
+  - enemy
+  - Ball
   layers:
   - Default
   - TransparentFX

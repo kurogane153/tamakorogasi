@@ -17,6 +17,8 @@ public class BallControll : MonoBehaviour
     [SerializeField] private GameObject _shockWave;
     private GameManager gm;
 
+    public bool isSpeedReduceHalf;  // ボールの速度を半減させるか
+
     private GUIStyle style;                 // デバッグ表示用
 
     void Start()
@@ -51,6 +53,10 @@ public class BallControll : MonoBehaviour
             //GameClearText.SetActive(true);
             
             StartCoroutine(nameof(GameClear));
+        }
+
+        if (isSpeedReduceHalf) {
+            rb.velocity = new Vector3(rb.velocity.x * 0.85f, rb.velocity.y, rb.velocity.z * 0.85f);
         }
     }
 
@@ -97,7 +103,7 @@ public class BallControll : MonoBehaviour
 
     private void OnGUI()
     {
-        GUI.Label(new Rect(0, 180, 500, 300), "magnitude : " + rb.velocity.magnitude, style);
+        //GUI.Label(new Rect(0, 180, 500, 300), "magnitude : " + rb.velocity.magnitude, style);
     }
 
 }
