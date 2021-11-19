@@ -77,8 +77,10 @@ public class BallControll : MonoBehaviour
             Debug.Log("すり抜けた！");
             itemCount++;
             gm.CoinCount = itemCount;
+            other.GetComponent<ItemScript>().PlayCoinEffect();
             other.gameObject.SetActive(false);
             SoundManager.Instance.PlaySE(SE.Coin);
+            
             Debug.Log(itemCount);
         }
         

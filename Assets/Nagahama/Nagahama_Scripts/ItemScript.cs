@@ -6,17 +6,7 @@ public class ItemScript : MonoBehaviour
 {
     [SerializeField] private GameObject _efffect;
 
-    void Start()
-    {
-        
-    }
-
-    void Update()
-    {
-        
-    }
-
-    private void OnDisable()
+    public void PlayCoinEffect()
     {
         Instantiate(_efffect, transform.position, Quaternion.identity);
     }

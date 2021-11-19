@@ -5,22 +5,23 @@ using UnityEngine.SceneManagement;
 
 public class TitleUIScripts : MonoBehaviour
 {
-    private bool isButtonPush;
+    [SerializeField] private int _gotoSceneIndex;
 
+    private bool isButtonPush;
 
     public void ChangeMainGameScene()
     {
         if (isButtonPush) return;
 
         isButtonPush = true;
-        SceneManager.LoadScene(1);
+        SceneManager.LoadScene(_gotoSceneIndex);
     }
 
     private void Update()
     {
         if (Input.anyKey) {
             SoundManager.Instance.PlaySystemSE(SystemSE.Decide);
-            SceneManager.LoadScene(1);
+            SceneManager.LoadScene(_gotoSceneIndex);
         }
                 
     }
