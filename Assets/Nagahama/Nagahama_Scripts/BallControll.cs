@@ -7,6 +7,7 @@ public class BallControll : MonoBehaviour
 {
     private Vector3 startPos;
     private Rigidbody rb;
+    private Rigidbody rbbuffer;
 
     private int itemCount;
 
@@ -18,6 +19,11 @@ public class BallControll : MonoBehaviour
     private GameManager gm;
 
     public bool isSpeedReduceHalf;  // ボールの速度を半減させるか
+    public bool isSpeedUp;
+    public bool isScaleUp;
+    public bool isBounceUp;
+
+    private bool scaleupflg = false;
 
     private GUIStyle style;                 // デバッグ表示用
 
@@ -32,18 +38,12 @@ public class BallControll : MonoBehaviour
             Debug.Log("ボールにRigidbodyがアタッチされている");
         }
         style = new GUIStyle();
-        style.fontSize = 30;
+        style.fontSize = 20;
 
     }
 
     void Update()
     {
-        //if (Input.GetButtonDown("Cancel")) {
-            //transform.position = startPos;
-            //if (rb) {
-                //rb.velocity = Vector3.zero;
-            //}
-        //}
     }
 
     void FixedUpdate()
@@ -57,6 +57,25 @@ public class BallControll : MonoBehaviour
 
         if (isSpeedReduceHalf) {
             rb.velocity = new Vector3(rb.velocity.x * 0.85f, rb.velocity.y, rb.velocity.z * 0.85f);
+        }
+
+        if (isSpeedUp)
+        {
+        }
+
+        //サイズアップアイテムを取った時の処理
+        if (isScaleUp)
+        {
+            if (!scaleupflg)
+            {
+                this.transform.localScale = new Vector3(0.4f, 0.4f, 0.4f);
+                scaleupflg = true;
+            }
+        }
+        else
+        {
+            this.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
+            scaleupflg = false;
         }
     }
 
@@ -80,7 +99,6 @@ public class BallControll : MonoBehaviour
             other.GetComponent<ItemScript>().PlayCoinEffect();
             other.gameObject.SetActive(false);
             SoundManager.Instance.PlaySE(SE.Coin);
-            
             Debug.Log(itemCount);
         }
         
@@ -106,6 +124,8 @@ public class BallControll : MonoBehaviour
     private void OnGUI()
     {
         //GUI.Label(new Rect(0, 180, 500, 300), "magnitude : " + rb.velocity.magnitude, style);
+        GUI.Label(new Rect(0, 180, 500, 300), "isSpeedUp : " + isSpeedUp, style);
+        GUI.Label(new Rect(0, 220, 500, 300), "rb.velocity : " + rb.velocity, style);
     }
 
 }

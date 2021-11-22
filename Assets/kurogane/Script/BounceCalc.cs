@@ -8,6 +8,8 @@ public class BounceCalc : MonoBehaviour
     private Vector3 objNomalVector = Vector3.zero;
     // ボールのrigidbody
     private Rigidbody rb;
+
+    private BallControll ballcontroll;
     // 跳ね返った後のverocity
     [HideInInspector] public Vector3 afterReflectVero = Vector3.zero;
 
@@ -16,13 +18,28 @@ public class BounceCalc : MonoBehaviour
 
         if (collision.gameObject.CompareTag("Wall"))
         {
-            // 当たった物体の法線ベクトルを取得+
-            objNomalVector = collision.contacts[0].normal;
-            Vector3 reflectVec = Vector3.Reflect(afterReflectVero, objNomalVector);
-            rb.velocity = reflectVec;
-            // 計算した反射ベクトルを保存
-            afterReflectVero = rb.velocity;
-            //Debug.Log("nomal:" + afterReflectVero);
+            if (ballcontroll.isBounceUp)
+            {
+                // 当たった物体の法線ベクトルを取得+
+                objNomalVector = collision.contacts[0].normal;
+                Vector3 reflectVec2 = Vector3.Reflect(afterReflectVero, objNomalVector * 1.2f);
+                rb.velocity = reflectVec2;
+                // 計算した反射ベクトルを保存
+                afterReflectVero = rb.velocity;
+                afterReflectVero = afterReflectVero / 1.2f;
+            }
+            else
+            {
+                // 当たった物体の法線ベクトルを取得+
+                objNomalVector = collision.contacts[0].normal;
+                Vector3 reflectVec = Vector3.Reflect(afterReflectVero, objNomalVector);
+                rb.velocity = reflectVec;
+                // 計算した反射ベクトルを保存
+                afterReflectVero = rb.velocity;
+                //afterReflectVero = afterReflectVero / 1.2f;
+                //Debug.Log("nomal:" + afterReflectVero);
+            }
+
         }
         
     }
@@ -31,5 +48,6 @@ public class BounceCalc : MonoBehaviour
     void Start()
     {
         rb = this.GetComponent<Rigidbody>();
+        ballcontroll = this.GetComponent<BallControll>();
     }
 }
