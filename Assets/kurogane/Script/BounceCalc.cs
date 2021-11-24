@@ -22,11 +22,11 @@ public class BounceCalc : MonoBehaviour
             {
                 // 当たった物体の法線ベクトルを取得+
                 objNomalVector = collision.contacts[0].normal;
-                Vector3 reflectVec2 = Vector3.Reflect(afterReflectVero, objNomalVector * 1.2f);
+                Vector3 reflectVec2 = Vector3.Reflect(afterReflectVero, objNomalVector * 1.3f);
                 rb.velocity = reflectVec2;
                 // 計算した反射ベクトルを保存
                 afterReflectVero = rb.velocity;
-                afterReflectVero = afterReflectVero / 1.2f;
+                afterReflectVero = afterReflectVero / 1.3f;
             }
             else
             {

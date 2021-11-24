@@ -14,11 +14,11 @@ public class IteBounceUp : MonoBehaviour
         if (other.CompareTag("Ball"))
         {
             ballControll = other.GetComponent<BallControll>();
-            StartCoroutine(nameof(Poison));
+            StartCoroutine(nameof(Bounce));
         }
     }
 
-    private IEnumerator Poison()
+    private IEnumerator Bounce()
     {
         transform.position = new Vector3(10000, 10000, 10000);
         ballControll.isBounceUp = true;

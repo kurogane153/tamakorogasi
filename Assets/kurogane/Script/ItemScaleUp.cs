@@ -14,11 +14,11 @@ public class ItemScaleUp : MonoBehaviour
         if (other.CompareTag("Ball"))
         {
             ballControll = other.GetComponent<BallControll>();
-            StartCoroutine(nameof(Poison));
+            StartCoroutine(nameof(Scale));
         }
     }
 
-    private IEnumerator Poison()
+    private IEnumerator Scale()
     {
         transform.position = new Vector3(10000, 10000, 10000);
         ballControll.isScaleUp = true;
