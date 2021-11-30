@@ -42,6 +42,7 @@ public class Bomb : MonoBehaviour
         if (other.CompareTag("Ball")) {
             Rigidbody ballRB = other.GetComponent<Rigidbody>();
             Vector3 vec = (ballRB.transform.position - transform.position).normalized;
+            ballRB.velocity = Vector3.zero;
             ballRB.AddForce((vec + Vector3.up) * _explosionForce, ForceMode.Impulse);
         }
     }

@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 5376992410575350386}
   - component: {fileID: 3878337482602287028}
   - component: {fileID: 8423690852963932134}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Bomb
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -143,7 +143,7 @@ GameObject:
   - component: {fileID: 7229058829924238551}
   - component: {fileID: 6099346644666439826}
   - component: {fileID: 6324564515572733049}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Spark
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4898,7 +4898,7 @@ GameObject:
   - component: {fileID: 7205105167216543855}
   - component: {fileID: 4530924869678248189}
   - component: {fileID: 1517588394628887924}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: ExplosionRange
   m_TagString: Untagged
   m_Icon: {fileID: 0}
