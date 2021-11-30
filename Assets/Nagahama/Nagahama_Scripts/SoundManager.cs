@@ -9,6 +9,8 @@ public enum SE
     Rolling,
     Conflict,
     Coin,
+    Explosion,
+    Fuse,
 
     MAX
 }

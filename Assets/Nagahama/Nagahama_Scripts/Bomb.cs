@@ -19,6 +19,9 @@ public class Bomb : MonoBehaviour
     // 爆発エリア描画用MeshRenderer
     [SerializeField] private MeshRenderer _aoEMeshRenderer;
 
+    // 爆発エフェクト
+    [SerializeField] private GameObject _explosionEffect;
+
     private MeshRenderer myMeshRenderer;
     private bool isAoESignEffect;   // 爆発前兆演出をするか
 
@@ -45,6 +48,8 @@ public class Bomb : MonoBehaviour
 
     private IEnumerator ExplosionStart()
     {
+        SoundManager.Instance.PlaySE(SE.Fuse);
+
         float waitTime = 0;
 
         while(waitTime < _explosionTime) {
@@ -65,11 +70,13 @@ public class Bomb : MonoBehaviour
         StopCoroutine(nameof(MaterialFadein));
         StopCoroutine(nameof(MaterialFadeout));
 
+        SoundManager.Instance.PlaySE(SE.Explosion);
+
         yield return new WaitForSeconds(0.1f);
         _explosionRange.enabled = false;
 
-
         // 爆発エフェクト処理書く
+        Instantiate(_explosionEffect, transform.position, Quaternion.identity);
 
         yield return new WaitForSeconds(3f);
         Destroy(gameObject);

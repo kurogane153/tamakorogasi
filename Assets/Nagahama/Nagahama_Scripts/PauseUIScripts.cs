@@ -14,7 +14,7 @@ public class PauseUIScripts : MonoBehaviour
         isButtonPush = true;
         Pauser.Resume();
         GameManager.Instance.StageScoreReset();
-        SceneManager.LoadScene(1);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         Pauser.isCanNotPausing = false;
     }
 

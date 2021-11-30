@@ -56,6 +56,8 @@ MonoBehaviour:
   - {fileID: 8300000, guid: a53b43a05471f2541b779ff7bb5ef66e, type: 3}
   - {fileID: 8300000, guid: 30fef67c7433a6240a0a81219642f1af, type: 3}
   - {fileID: 8300000, guid: f0b4c5db860aefd438f159cea582d12e, type: 3}
+  - {fileID: 8300000, guid: af610f642b7418b4199b267decb65f08, type: 3}
+  - {fileID: 8300000, guid: 8423f1d22b16bd04bbf048ed4866f469, type: 3}
   SystemSE:
   - {fileID: 8300000, guid: d0173623392b5274d98cc28dfb7796ac, type: 3}
   - {fileID: 8300000, guid: 7d010b148e8afef4eb603803620a7493, type: 3}
