@@ -128,8 +128,8 @@ public class BallControll : MonoBehaviour
     private void OnGUI()
     {
         //GUI.Label(new Rect(0, 180, 500, 300), "magnitude : " + rb.velocity.magnitude, style);
-        GUI.Label(new Rect(0, 180, 500, 300), "isSpeedUp : " + isSpeedUp, style);
-        GUI.Label(new Rect(0, 220, 500, 300), "rb.velocity : " + rb.velocity, style);
+        //GUI.Label(new Rect(0, 180, 500, 300), "isSpeedUp : " + isSpeedUp, style);
+        //GUI.Label(new Rect(0, 220, 500, 300), "rb.velocity : " + rb.velocity, style);
     }
 
 }
