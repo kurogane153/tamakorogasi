@@ -22,6 +22,8 @@ public class IteBounceUp : MonoBehaviour
     {
         transform.position = new Vector3(10000, 10000, 10000);
         ballControll.isBounceUp = true;
+        SoundManager.Instance.PlaySE(SE.BounceUpItemGet);
+
         yield return new WaitForSeconds(_ballBounceUpReduceTime);
         ballControll.isBounceUp = false;
     }

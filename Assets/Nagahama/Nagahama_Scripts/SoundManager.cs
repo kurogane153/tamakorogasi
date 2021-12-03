@@ -11,6 +11,7 @@ public enum SE
     Coin,
     Explosion,
     Fuse,
+    BounceUpItemGet,
 
     MAX
 }

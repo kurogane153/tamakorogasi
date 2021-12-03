@@ -248,6 +248,7 @@ GameObject:
   - component: {fileID: 169155385}
   - component: {fileID: 169155386}
   - component: {fileID: 169155387}
+  - component: {fileID: 169155388}
   m_Layer: 0
   m_Name: Sphere
   m_TagString: Ball
@@ -520,6 +521,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _killCameraPause: 0
+--- !u!114 &169155388
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 169155376}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d222ae151cb9c241bbcc69bcc4b4f17, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ChangeColorTime: 0.01
+  Smooth: 0.01
+  HSV_Hue: 1
+  HSV_Saturation: 1
+  HSV_Brightness: 1
+  HSV_Hue_Max: 1
+  HSV_Hue_Min: 0
 --- !u!1001 &175481346
 PrefabInstance:
   m_ObjectHideFlags: 0
