@@ -121,7 +121,7 @@ public class BallControll : MonoBehaviour
         GameObject.FindObjectOfType<FloorControll>().enabled = false;
 
         foreach(var bmsp in FindObjectsOfType<BombSpawner>()) {
-            bmsp.enabled = false;
+            bmsp.gameObject.SetActive(false);
         }
     }
 

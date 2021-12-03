@@ -12,6 +12,11 @@ public class BombSpawner : MonoBehaviour
         StartCoroutine(BombSpawn(_firstSpan));
     }
 
+    private void OnDisable()
+    {
+        StopCoroutine(nameof(BombSpawn));
+    }
+
     private IEnumerator BombSpawn(float spawnTime)
     {
         yield return new WaitForSeconds(spawnTime);
