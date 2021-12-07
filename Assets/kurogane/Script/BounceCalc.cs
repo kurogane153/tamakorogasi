@@ -19,6 +19,9 @@ public class BounceCalc : MonoBehaviour
     // アイテムで強化されている間適用される反射力
     [SerializeField] private float _itemEnhancedBouncePower = 1.3f;
 
+    // 反射力の上限
+    [SerializeField] private float _bouncePowerRimit = 15f;
+
     public void OnCollisionEnter(Collision collision)
     {
 
@@ -26,20 +29,32 @@ public class BounceCalc : MonoBehaviour
         {
             if (ballcontroll.isBounceUp)
             {
+                float force = _itemEnhancedBouncePower;
+
+                if(rb.velocity.magnitude < _bouncePowerRimit) {
+                    force = 1f;
+                }
+
                 // 当たった物体の法線ベクトルを取得+
                 objNomalVector = collision.contacts[0].normal;
-                Vector3 reflectVec2 = Vector3.Reflect(afterReflectVero, objNomalVector * _itemEnhancedBouncePower);
+                Vector3 reflectVec2 = Vector3.Reflect(afterReflectVero, objNomalVector * force);
                 rb.velocity = reflectVec2;
 
                 // 計算した反射ベクトルを保存
                 afterReflectVero = rb.velocity;
-                afterReflectVero = afterReflectVero / _itemEnhancedBouncePower;
+                afterReflectVero = afterReflectVero / force;
             }
             else
             {
+                float force = _bouncePower;
+
+                if (rb.velocity.magnitude < _bouncePowerRimit) {
+                    force = 1f;
+                }
+
                 // 当たった物体の法線ベクトルを取得+
                 objNomalVector = collision.contacts[0].normal;
-                Vector3 reflectVec = Vector3.Reflect(afterReflectVero, objNomalVector * _bouncePower);
+                Vector3 reflectVec = Vector3.Reflect(afterReflectVero, objNomalVector * force);
                 rb.velocity = reflectVec;
                 // 計算した反射ベクトルを保存
                 afterReflectVero = rb.velocity;

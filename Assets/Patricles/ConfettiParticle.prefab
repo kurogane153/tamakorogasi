@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 6568812945868035447}
   - component: {fileID: 6568812945868035446}
   - component: {fileID: 6568812945868035441}
+  - component: {fileID: 651364731490009979}
   m_Layer: 0
   m_Name: ConfettiParticle
   m_TagString: Untagged
@@ -4754,3 +4755,16 @@ ParticleSystemRenderer:
   m_Mesh2: {fileID: 0}
   m_Mesh3: {fileID: 0}
   m_MaskInteraction: 0
+--- !u!114 &651364731490009979
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6568812945868035440}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 211a962d9a3cb5542a1448436f6504f1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _anglePerFrame: 0.0025

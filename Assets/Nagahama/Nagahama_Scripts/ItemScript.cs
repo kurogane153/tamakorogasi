@@ -10,4 +10,5 @@ public class ItemScript : MonoBehaviour
     {
         Instantiate(_efffect, transform.position, Quaternion.identity);
     }
+
 }
