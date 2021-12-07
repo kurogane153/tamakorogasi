@@ -56,6 +56,7 @@ public class GamingColorMaterial : MonoBehaviour
     {
         if (!ballControll.isBounceUp) {
             material.SetColor("_EmissionColor", startColor);
+            
             return;
         }
 
