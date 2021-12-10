@@ -559,7 +559,7 @@ SphereCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 169155376}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: b2ec6db0ec4807c4886b5a42ebcad25a, type: 2}
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
@@ -678,8 +678,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   afterReflectVero: {x: 0, y: 0, z: 0}
-  _bouncePower: 1.1
-  _itemEnhancedBouncePower: 1.2
+  _bouncePower: 2
+  _itemEnhancedBouncePower: 3
   _bouncePowerRimit: 15
 --- !u!114 &169155384
 MonoBehaviour:
@@ -1502,9 +1502,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _horDeadZone: 0.5
   _verDeadZone: 0.5
-  _reachTimeMaxAngle: 1.002
-  _decelerateTimeStickNeutral: 0.35
-  _reachTimeNeutralAngle: 1.002
+  _reachTimeMaxAngle: 0.8
+  _decelerateTimeStickNeutral: 0.3
+  _reachTimeNeutralAngle: 0.8
   _maxAngle: 30
   _increaseCurve:
     serializedVersion: 2
@@ -1512,20 +1512,20 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 0
       value: 0
-      inSlope: 0.1835569
-      outSlope: 0.1835569
+      inSlope: 0.41168207
+      outSlope: 0.41168207
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
-      outWeight: 0.21843003
+      outWeight: 0.16040955
     - serializedVersion: 3
       time: 1
       value: 1
-      inSlope: 0.7831759
-      outSlope: 0.7831759
+      inSlope: 1.126136
+      outSlope: 1.126136
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0.15358365
+      inWeight: 0.09215015
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2

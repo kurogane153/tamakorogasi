@@ -37,8 +37,9 @@ public class BounceCalc : MonoBehaviour
 
                 // 当たった物体の法線ベクトルを取得+
                 objNomalVector = collision.contacts[0].normal;
-                Vector3 reflectVec2 = Vector3.Reflect(afterReflectVero, objNomalVector * force);
-                rb.velocity = reflectVec2;
+                //objNomalVector.y *= 2;
+                Vector3 reflectVec2 = Vector3.Reflect(afterReflectVero, objNomalVector );
+                rb.velocity = reflectVec2 * force;
 
                 // 計算した反射ベクトルを保存
                 afterReflectVero = rb.velocity;
@@ -54,8 +55,10 @@ public class BounceCalc : MonoBehaviour
 
                 // 当たった物体の法線ベクトルを取得+
                 objNomalVector = collision.contacts[0].normal;
-                Vector3 reflectVec = Vector3.Reflect(afterReflectVero, objNomalVector * force);
-                rb.velocity = reflectVec;
+                //objNomalVector.y *= 2;
+                Vector3 reflectVec = Vector3.Reflect(afterReflectVero, objNomalVector);
+                rb.velocity = reflectVec * force;
+                //transform.Translate(0, 0.1f, 0);
                 // 計算した反射ベクトルを保存
                 afterReflectVero = rb.velocity;
                 //afterReflectVero = afterReflectVero / 1.2f;

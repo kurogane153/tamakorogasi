@@ -12,6 +12,7 @@ public enum SE
     Explosion,
     Fuse,
     BounceUpItemGet,
+    StageClear,
 
     MAX
 }

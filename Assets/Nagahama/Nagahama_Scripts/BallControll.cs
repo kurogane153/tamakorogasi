@@ -24,6 +24,7 @@ public class BallControll : MonoBehaviour
     public bool isBounceUp;
 
     private bool scaleupflg = false;
+    private bool isClear;
 
     private GUIStyle style;                 // デバッグ表示用
 
@@ -48,7 +49,7 @@ public class BallControll : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (itemCount == 12)
+        if (itemCount == 12 && !isClear)
         {
             //GameClearText.SetActive(true);
             
@@ -111,8 +112,11 @@ public class BallControll : MonoBehaviour
 
     private IEnumerator GameClear()
     {
+        isClear = true;
+
         _clearConfetti.Play();
         _gameClearText.SetActive(true);
+        SoundManager.Instance.PlaySE(SE.StageClear);
         yield return new WaitForSeconds(1f);
 
         GetComponent<AudioSource>().enabled = false;
